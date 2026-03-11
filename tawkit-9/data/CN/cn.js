@@ -1,0 +1,21 @@
+var JS_CITIES_DATA =
+[
+"cn.aksu.",
+"cn.aral.",
+"cn.bole.",
+"cn.changji.",
+"cn.hami.",
+"cn.hotan.",
+"cn.karamay.",
+"cn.kashgar.",
+"cn.korla.",
+"cn.kuqa.",
+"cn.shache.",
+"cn.shihezi.",
+"cn.tacheng.",
+"cn.tumxuk.",
+"cn.turpan.",
+"cn.ueruemqi.",
+"cn.xinyuan.",
+"cn.yili.",
+];

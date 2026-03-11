@@ -1,0 +1,37 @@
+{
+  "version": "1.0",
+  "session": {
+    "new": true,
+    "sessionId": "amzn1.echo-api.session.test-session-id",
+    "application": { "applicationId": "amzn1.ask.skill.test-skill-id" },
+    "user": { "userId": "amzn1.ask.account.test-user-id" }
+  },
+  "context": {
+    "System": {
+      "application": { "applicationId": "amzn1.ask.skill.test-skill-id" },
+      "user": { "userId": "amzn1.ask.account.test-user-id" },
+      "device": {
+        "deviceId": "test-device-id",
+        "supportedInterfaces": {
+          "Alexa.Presentation.APL": {
+            "runtime": { "maxVersion": "2024.1" }
+          }
+        }
+      }
+    },
+    "Viewport": {
+      "shape": "RECTANGLE",
+      "pixelWidth": 1280,
+      "pixelHeight": 800,
+      "dpi": 160,
+      "currentPixelWidth": 1280,
+      "currentPixelHeight": 800
+    }
+  },
+  "request": {
+    "type": "LaunchRequest",
+    "requestId": "amzn1.echo-api.request.test",
+    "locale": "en-US",
+    "timestamp": "2026-03-10T12:00:00Z"
+  }
+}

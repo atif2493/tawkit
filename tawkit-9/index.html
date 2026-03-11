@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<title>Tawkit</title>
+<meta http-equiv='content-type' content='text/html; charset=UTF-8'>
+<!--
+بسم الله الرحمن الرحيم
+الحمد لله رب العالمين
+والصلاة والسلام على سيدنا محمد
+وعلى آله وصحبه ومن تبعهم بإحسان إلى يوم الدين
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Tawkit.net	: Prayer Times Application
+Copyright	: Ismail CHAGDALI | www.tawkit.net
+Contact		: ismail@tawkit.net
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+شروط الاستعمال
+البرنامج مجاني !
+هذا التطبيق وقف لبيوت الله و لا يجوز بيعه .
+لايجوز حذف أو تغيير إسم البرنامج أو المؤلف .
+لابد بالاحتفاظ بهذا الإشعار القانوني مع البرنامج .
+يجوز التعديل على التطبيق  للاستخدام الشخصي فقط , لا لنشره متغيرا .
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+https://www.tawkit.net/#License
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+License :
+This software is free of charge but not open source.
+This app is intended for use in Mosques, homes, and any place where it may be useful.
+Selling this application is strictly prohibited under any circumstances.
+You are not allowed to change or remove the app name or author’s name.
+You may modify the app for personal use only (home and local Mosque).
+You are not allowed to distribute a modified version of the app.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-->
+<meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1'>
+<link rel='icon' href='favicon.ico'>
+<script src='settings-defaults.js?s=000'></script>
+<script>
+const jcTawkitVersionSTR = 'TAWKIT.NET 9.63';
+const jcTawkitVersionINT = '0963';
+const v9327263 = 'https://www.tawkit.net/version/';
+
+function dolog(v9450763, v9450863 = null)
+{
+if(v9450863) console.log('TWKT : '+v9450763+' | '+v9450863);
+else console.log('TWKT : '+v9450763);
+}
+
+const v9464763 = 963;
+let v9464863 = localStorage.getItem('JS_DATA'); 
+let JS_BOTTOM_MSGS = [];
+let JS_SLIDES_DATA = [];
+let JS_REMINDERS_DATA = [];
+if(v9464863)
+{
+let v9450963 = JSON.parse(v9464863);
+for(let propt in v9450963){if(propt in JS_DATA) JS_DATA[propt] = v9450963[propt];}
+}
+JS_DATA.ucNowCityCODE = JS_DATA.ucNowCityCODE.toLowerCase();
+</script>
+<script>
+let v9451063 = (JS_DATA.ucForcedVertical > 0 ? "style2.css" : "style1.css"); 
+document.write("<link rel='stylesheet' href='style0.css?s="+v9464763+"'>");
+document.write("<link rel='stylesheet' href='"+v9451063+"?s="+v9464763+"'>");
+document.write("<script src='languages/lang-"+JS_DATA.ucLangNOW+".js'><\/script>");
+document.write("<script src='ayats/ayats-"+JS_DATA.ucAyatsLANG+".js'><\/script>");
+</script>
+<script src='ahadith.js'></script>
+<script src='countries.js'></script>
+<script src='messages-bottom.js'></script>
+<script src='messages-slides.js'></script>
+<script src='azkar/azkar.js'></script>
+<script src='azkar/azkar-sabah.js'></script>
+<script src='azkar/azkar-masaa.js'></script>
+<script src='m1prime.js?s=963'></script>
+</head>
+<body id='v9504363' class=''>
+<div id='v9394263'>
+    <audio id='v9421363' 	data-xfile='audio_azan' src='audio/audio_azan.mp3'></audio>
+    <audio id='v9421463' 	data-xfile='audio_fajr' src='audio/audio_fajr.mp3'></audio>
+    <audio id='v9435863' 	data-xfile='short_azan'  src='audio/short_azan.mp3'></audio>
+    <audio id='v9421563' 	data-xfile='short_iqama' src='audio/short_iqama.mp3'></audio>
+    <audio id='v9478363' 		data-xfile='wbeeep' src='audio/wbeeep.mp3'></audio>
+    <audio id='v9504463' 		data-xfile='wteet'  src='audio/wteet.mp3'></audio>
+    <audio id='v9464963' 		data-xfile='alert1' src='audio/alert1.mp3'></audio>
+    <audio id='v9478463' 		data-xfile='w1drop' src='audio/w1drop.mp3'></audio>
+    <audio id='v9478563' 		data-xfile='w3drop' src='audio/w3drop.mp3'></audio>
+    <audio id='v9451163' 	data-xfile='w3alerts' src='audio/w3alerts.mp3'></audio>
+</div>
+
+<div id='v9465063'>
+<div id='v9465163'></div>
+
+    <div id='v9465263' onclick='v9356963();'>&#9776;</div>
+    <div id='v9435963'></div>
+    <img id='v9421663' alt='' src='logo.png' ondblclick='v9332363();'>
+    <div id='v9436063' onclick='v9406563();'></div>
+    <div id='v9436163'></div>
+
+    <div id='v9421763' onclick='v9368363();'>
+        <div id='v9436263'><img id='v9421863' alt='' src='images/meteo/0.png'></div>
+        <div id='v9436363'>-</div>
+        <div id='v9436463'><span id='v9451263'>-</span></div>
+    </div>
+
+    <div id='v9421963'>
+        <div id='v9379463' onclick='v9342963();'></div>
+        <div id='v9379563' onclick='v9329263();'></div>
+    </div>
+
+    <div id='v9394363'></div>
+
+    <div id='v9379663' onclick='v9337763();'>
+        <div id='v9406663'></div>
+        <div id='v9379763'></div>
+        <div id='v9422063'></div>
+    </div>
+
+    <div id='v9379863' onclick='v9337763();'>
+        <span id='v9406763'></span><span id='v9368463'></span>
+    </div>
+
+    <div id='v9406863' class='v9491863' onclick='v9394463(this.id);'>
+    	<div id='v9368563'></div>
+        <div id='v9394563'></div>
+        <div id='v9394663'></div>
+        <div id='v9406963'></div>
+    </div>
+
+    <div id='v9407063' class='v9491863' onclick='v9394463(this.id);'>
+    	<div id='v9368663'></div>
+        <div id='v9407163'></div>
+    </div>
+
+    <div id='v9422163' class='v9491863' onclick='v9394463(this.id);'>
+    <div id='v9379963'></div>
+        <div id='v9368763'></div>
+    </div>
+
+
+    <div id='v9407263' class='v9451363'>
+        <div id='v9407363' class='v9451463 v9436563' onclick='v9349163();'></div>
+    </div>
+    <div id='v9407463' class='v9451363'>
+        <div id='v9407563' class='v9451463'></div>
+    </div>
+
+
+
+    <div id='v9451563' class='v9491863'>
+        <table id='v9422263'>
+            <tr>
+                <td>
+                    <div id='v9407663'>&nbsp;</div>
+                    <div id='v9478663' class='v9422363'></div>
+                    <div id='v9478763' class='v9422463'></div>
+                </td>
+                <td>
+                    <div id='v9478863' class='v9422363'></div>
+                    <div id='v9478963' class='v9422463'></div>
+                </td>
+                <td>
+                    <div id='v9479063' class='v9422363'></div>
+                    <div id='v9479163' class='v9422463'></div>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td>
+                    <div id='v9407763'>&nbsp;</div>
+                    <div id='v9479263' class='v9422363'></div>
+                    <div id='v9479363' class='v9422463'></div>
+                </td>
+                <td>
+                    <div id='v9479463' class='v9422363'></div>
+                    <div id='v9479563' class='v9422463'></div>
+                </td>
+                <td>
+                    <div id='v9479663' class='v9422363'></div>
+                    <div id='v9479763' class='v9422463'></div>
+                </td>
+            </tr>
+
+        </table>
+    </div>
+
+
+
+    <div id='v9465363'>&nbsp;</div>
+
+    <div id='v9380063' class=''>
+        <div id='v9436663'>
+            <div id='v9357063'>
+	            <div id='v9465463'></div>
+	            <div id='v9479863'></div>
+	            <div id='v9465563'></div>
+            </div>
+        </div>
+        <div id='v9491963' class='v9465663'>
+            <div id='v9511963' class='v9451663' onclick='v9357163();'>33333333333</div>
+            <div id='v9512063' class='v9451763' onclick='v9357263();'></div>
+            <span id='v9509963' class='v9436763' ondblclick='v9337863();'></span>
+            <div id='VmtALT0' class='v9479963'></div>
+                    <div id='v9451863' onclick='v9436863();'>
+                    	<div id='v9407863'></div>
+                    	<div id='v9407963'></div>
+                    	<div id='v9422563'></div>
+                    </div>
+        </div>
+        <div id='v9492063' class='v9408063'>
+            <div id='v9512163' class='v9451663'></div>
+            <div id='v9512263' class='v9451763'></div>
+            <span id='v9510063' class='v9436763'></span>
+            <div id='VmtALT1' class='v9479963'></div>
+        </div>
+        <div id='v9492163' class='v9465663'>
+            <div id='v9512363' class='v9451663' onclick='v9343063();'></div>
+            <div id='v9512463' class='v9451763' onclick='v9337963();'></div>
+            <span id='v9510163' class='v9436763'></span>
+            <div id='VmtALT2' class='v9479963'></div>
+        </div>
+        <div id='v9492263' class='v9465663'>
+            <div id='v9512563' class='v9451663'></div>
+            <div id='v9512663' class='v9451763' onclick='v9394763();'></div>
+            <span id='v9510263' class='v9436763' onclick='v9394863();'></span>
+            <div id='VmtALT3' class='v9479963'></div>
+        </div>
+        <div id='v9492363' class='v9465663'>
+            <div id='v9512763' class='v9451663' ondblclick='v9394963();'></div>
+            <div id='v9512863' class='v9451763'></div>
+            <span id='v9510363' class='v9436763' ondblclick='v9380163();'></span>
+            <div id='VmtALT4' class='v9479963'></div>
+        </div>
+        <div id='v9492463' class='v9465663'>
+            <div id='v9512963' class='v9451663'></div>
+            <div id='v9513063' class='v9451763'></div>
+            <span id='v9510463' class='v9436763' onclick='v9332463();'>-</span>
+            <div id='VmtALT5' class='v9479963'></div>
+        </div>
+    </div>
+
+
+    <div id='v9465763' onclick='v9338063();'><img id='v9436963' alt='' src='images/no-mobile.png'></div>
+    <div id='v9422663' onclick='v9329363();'></div>
+    <div id='v9422763' onclick='v9329363();'><div id='v9480063' class='v9437063'></div></div>
+    <div id='v9422863'></div>
+    <div id='v9480163'>٭</div>
+
+    <div id='v9465863' class='v9491863'>
+    	<div id='v9451963' onclick='v9380263();'>
+        <div id='v9504563' class='v9465963'></div>
+        <div id='v9408163'><div id='v9408263' class='v9491863'></div></div>
+        </div>
+    </div>
+
+
+    <div id='v9452063' class='v9491863' onclick='v9368863();'>
+        <div id='v9492563' class='v9465963'></div>
+        <div id='v9408363'>
+            <div id='v9408463'></div>
+        </div>
+    </div>
+
+    <div id='v9480263' class='v9491863' onclick='v9380363();'>
+        <div id='v9492663' class='v9465963'></div>
+    </div>
+
+
+    <div id='v9380463' class='v9491863'>
+        <svg id='v9492763' viewBox='0 0 36 36'>
+            <path id='v9480363' stroke-dasharray='100, 100' d='M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831'></path>
+        </svg>
+        <div id='v9480463'></div>
+        <div id='v9480563'></div>
+    </div>
+
+
+
+    <div id='v9437163' class='v9491863' onclick="v9394463('v9437163');"></div>
+    <div id='v9437263'></div>
+
+    <div id='v9395063' class='v9491863' onclick='v9357363();'>
+        <div id='v9408563'></div>
+        <div id='v9437363'></div>
+    </div>
+
+    <img id='v9492863' alt='' src='./ps.png' onclick='v9395163();'>
+</div>
+
+
+
+<div id='v9466063'>
+<div id='v9466163'></div>
+
+    <div id='v9466263' onclick='v9356963();'>&#9776;</div>
+    <img id='v9422963' alt='' src='logo.png' ondblclick='v9332363();'>
+    <div id='v9380563' class='v9437463' onclick='v9406563();'><span id='v9343163'></span></div>
+    <div id='v9437563' class='v9452163' onclick='v9357463();'></div>
+    <div id='v9423063' class='v9437663' onclick='v9368363();'>
+        <div id='v9437763'><img id='v9423163' alt='' src='images/meteo/0.png'></div>
+        <div id='v9437863'>-</div>
+        <div id='v9437963'><span id='v9452263'>-</span></div>
+    </div>
+    <div id='v9395263'></div>
+
+    <div id='v9380663' onclick='v9337763();'>
+        <div id='v9408663'></div>
+        <div id='v9380763'></div>
+        <div id='v9423263'></div>
+    </div>
+
+    <div id='v9380863' onclick='v9337763();'>
+        <span id='v9408763'></span><span id='v9368963'></span>
+    </div>
+
+    <div id='v9408863' class='v9451363' onclick='v9349163();'>
+        <div id='v9452363' class='v9451463 v9436563'></div>
+    </div>
+    <div id='v9408963' class='v9451363'>
+        <div id='v9452463' class='v9451463'></div>
+    </div>
+
+    <div id='v9423363'>
+        <div id='v9380963' onclick='v9343263();'></div>
+        <div id='v9381063' onclick='v9329263();'></div>
+    </div>
+
+    <div id='v9423463'>
+        <div id='v9369063'></div>
+        <div id='v9395363'></div>
+        <div id='v9381163'></div>
+    </div>
+
+    <div id='v9409063' class='v9491863' onclick='v9394463(this.id);'>
+    <div id='v9369163'>&nbsp;</div>
+        <div id='v9395463'></div>
+        <div id='v9395563'></div>
+        <div id='v9409163'></div>
+    </div>
+
+
+    <div id='v9409263' class='v9491863' onclick='v9394463(this.id);'>
+    <div id='v9369263'></div>
+        <div id='v9409363'></div>
+    </div>
+
+    <div id='v9423563' class='v9491863' onclick='v9394463(this.id);'>
+     <div id='v9381263'></div>
+        <div id='v9369363'></div>
+    </div>
+
+
+
+    <div id='v9452563' class='v9491863'>
+        <table id='v9423663'>
+            <tr>
+                <td>
+                    <div id='v9423763'>&nbsp;</div>
+                    <div id='v9480663' class='v9423863'></div>
+                    <div id='v9480763' class='v9423963'></div>
+                </td>
+                <td>
+                    <div id='v9480863' class='v9423863'></div>
+                    <div id='v9480963' class='v9423963'></div>
+                </td>
+                <td>
+                    <div id='v9481063' class='v9423863'></div>
+                    <div id='v9481163' class='v9423963'></div>
+                </td>
+                <td>
+                    <div id='v9481263' class='v9423863'></div>
+                    <div id='v9481363' class='v9423963'></div>
+                </td>
+                <td>
+                    <div id='v9481463' class='v9423863'></div>
+                    <div id='v9481563' class='v9423963'></div>
+                </td>
+                <td>
+                    <div id='v9481663' class='v9423863'></div>
+                    <div id='v9481763' class='v9423963'></div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div id='v9438063'></div>
+    <div id='v9395663'>
+        <table id='v9409463' class='v9504663'>
+            <tr>
+                <td id='v9452663' class='v9409563'>
+                    <div id='v9452763'>&nbsp;</div>
+                    <div id='v9504763' class='v9452863' onclick='v9357163();'></div>
+                    <div id='v9504863' class='v9452963' onclick='v9357263();'></div>
+                    <div id='v9504963' class='v9438163' ondblclick='v9337863();'></div>
+                    <div id='HmtALT0' class='v9481863'></div>
+                    <div id='v9453063' onclick='v9436863();'>
+                    	<div id='v9409663'></div>
+                    	<div id='v9409763'></div>
+                    	<div id='v9424063'></div>
+                    </div>
+
+                </td>
+                <td id='v9453163' class='v9409563'>
+                    <div id='v9505063' class='v9452863'></div>
+                    <div id='v9505163' class='v9452963'></div>
+                    <div id='v9505263' class='v9438163'></div>
+                    <div id='HmtALT1' class='v9481863'></div>
+                </td>
+                <td id='v9453263' class='v9409563'>
+                    <div id='v9505363' class='v9452863' onclick='v9343063();'></div>
+                    <div id='v9505463' class='v9452963' onclick='v9337963();'></div>
+                    <div id='v9505563' class='v9438163'></div>
+                    <div id='HmtALT2' class='v9481863'></div>
+                </td>
+                <td id='v9453363' class='v9409563'>
+                    <div id='v9505663' class='v9452863'></div>
+                    <div id='v9505763' class='v9452963' onclick='v9394763();'></div>
+                    <div id='v9505863' class='v9438163' onclick='v9394863();'></div>
+                    <div id='HmtALT3' class='v9481863'></div>
+                </td>
+                <td id='v9453463' class='v9409563'>
+                    <div id='v9505963' class='v9452863' ondblclick='v9394963();'></div>
+                    <div id='v9506063' class='v9452963'></div>
+                    <div id='v9506163' class='v9438163' ondblclick='v9380163();'></div>
+                    <div id='HmtALT4' class='v9481863'></div>
+                </td>
+                <td id='v9453563' class='v9409563'>
+                    <div id='v9506263' class='v9452863'></div>
+                    <div id='v9506363' class='v9452963' ondblclick='v9369463();'></div>
+                    <div id='v9506463' class='v9438163' onclick='v9332463();'></div>
+                    <div id='HmtALT5' class='v9481863'></div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+
+
+
+    <div id='v9466363' onclick='v9369563();'></div>
+    <div id='v9424163' onclick='v9329363();'></div>
+    <div id='v9424263' onclick='v9329363();'><div id='v9481963' class='v9437063'></div></div>
+    <div id='v9424363'></div>
+    <div id='v9466463'></div>
+    <div id='v9482063'>٭</div>
+    <div id='v9466563' onclick='v9338063();'><img id='v9438263' alt='' src='images/no-mobile.png'></div>
+
+    <div id='v9466663' class='v9491863'>
+    	<div id='v9453663' onclick='v9380263();'>
+        <div id='v9506563' class='v9465963'></div>
+        <div id='v9409863'><div id='v9409963' class='v9491863'></div></div>
+        </div>
+    </div>
+
+    <div id='v9453763' class='v9491863' onclick='v9368863();'>
+        <div id='v9492963' class='v9465963'></div>
+        <div id='v9410063'>
+            <div id='v9410163'></div>
+        </div>
+    </div>
+
+    <div id='v9482163' class='v9491863' onclick='v9380363();'>
+        <div id='v9493063' class='v9465963'></div>
+    </div>
+
+
+
+    <div id='v9381363' class='v9491863'>
+        <svg id='v9493163' viewBox='0 0 36 36'>
+            <path id='v9482263' stroke-dasharray='100, 100' d='M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831'></path>
+        </svg>
+        <div id='v9482363'></div>
+        <div id='v9482463'></div>
+    </div>
+
+
+    <div id='v9438363' class='v9491863' onclick="v9394463('v9438363');"></div>
+    <div id='v9438463'></div>
+
+    <div id='v9395763' class='v9491863' onclick='v9357363();'>
+    <div id='v9357563'></div>
+        <div id='v9410263'></div>
+        <div id='v9410363'></div>
+        <div id='v9438563'></div>
+        <div id='v9453863'><img alt='' src='images/no-mobile.png'></div>
+    </div>
+
+    <img id='v9493263' alt='' src='./ps.png' onclick='v9395163();'>
+
+
+</div>
+
+
+
+
+<div id='v9493363' style='touch-action:none;'>
+
+    <div class='v9493463'>
+    	<div id='v9482563' ondblclick='v9395163();'></div>
+        <div id='v9482663'><span onclick="v9424463('v9453963', 0);">&#9650;</span> &nbsp;&nbsp; <span onclick="v9424463('v9453963', 1);">&#9660;</span></div>
+    </div>
+
+    <div id='v9453963'>
+        <div id='v9454063'>
+
+
+			<span id='BN' onclick='v9454163(this);' title='Bengali'>বাংলা </span>
+			<span id='AR' onclick='v9454163(this);' title='Arabic'>عربي </span>
+			<span id='PA' onclick='v9454163(this);' title='Punjabi'>پنجابی </span>
+			<span id='UR' onclick='v9454163(this);' title='Urdu'>اردو </span>
+			<br>
+			<span id='HI' onclick='v9454163(this);' title='Hindi'>हिंदी </span>
+			<span id='AF' onclick='v9454163(this);' title='Dari (Afghan Persian)'>دری </span>
+			<span id='PS' onclick='v9454163(this);' title='Pashto'>پښتو </span>
+			<span id='KU' onclick='v9454163(this);' title='Kurdish'>کوردی </span>
+			<br>
+			<span id='AM' onclick='v9454163(this);' title='Amharic'>AM</span>
+			<span id='AZ' onclick='v9454163(this);' title='Azerbaijani'>AZ</span>
+			<span id='BG' onclick='v9454163(this);' title='Bulgarian'>BG</span>
+			<span id='BS' onclick='v9454163(this);' title='Bosnian'>BS</span>
+			<span id='DA' onclick='v9454163(this);' title='Danish'>DA</span>
+			<span id='DE' onclick='v9454163(this);' title='German'>DE</span>
+			<span id='EN' onclick='v9454163(this);' title='English'>EN</span>
+			<span id='ES' onclick='v9454163(this);' title='Spanish'>ES</span>
+			<br>
+
+			<span id='FA' onclick='v9454163(this);' title='Persian'>FA</span>
+			<span id='FP' onclick='v9454163(this);' title='Filipino'>FP</span>
+			<span id='FR' onclick='v9454163(this);' title='French'>FR</span>
+			<span id='HA' onclick='v9454163(this);' title='Hausa'>HA</span>
+			<span id='ID' onclick='v9454163(this);' title='Indonesian'>ID</span>
+			<span id='IT' onclick='v9454163(this);' title='Italian'>IT</span>
+			<span id='JA' onclick='v9454163(this);' title='Japanese'>JA</span>
+			<span id='KK' onclick='v9454163(this);' title='Kazakh'>KK</span>
+			<br>
+
+			<span id='KM' onclick='v9454163(this);' title='Shikomoro'>KM</span>
+			<span id='KO' onclick='v9454163(this);' title='Korean'>KO</span>
+			<span id='KY' onclick='v9454163(this);' title='Kyrgyz'>KY</span>
+			<span id='MS' onclick='v9454163(this);' title='Malay'>MS</span>
+			<span id='NL' onclick='v9454163(this);' title='Dutch'>NL</span>
+			<span id='NO' onclick='v9454163(this);' title='Norwegian'>NO</span>
+			<span id='OM' onclick='v9454163(this);' title='Oromo'>OM</span>
+			<span id='PT' onclick='v9454163(this);' title='Portuguese'>PT</span>
+			<br>
+
+			<span id='RU' onclick='v9454163(this);' title='Russian'>RU</span>
+			<span id='SI' onclick='v9454163(this);' title='Sinhala'>SI</span>
+			<span id='SO' onclick='v9454163(this);' title='Somali'>SO</span>
+			<span id='SQ' onclick='v9454163(this);' title='Albanian'>SQ</span>
+			<span id='SV' onclick='v9454163(this);' title='Swedish'>SV</span>
+			<span id='SW' onclick='v9454163(this);' title='Swahili'>SW</span>
+			<span id='TA' onclick='v9454163(this);' title='Tamil'>TA</span>
+			<span id='TG' onclick='v9454163(this);' title='Tajik'>TG</span>
+			<br>
+
+			<span id='TH' onclick='v9454163(this);' title='Thai'>TH</span>
+			<span id='TK' onclick='v9454163(this);' title='Turkmen'>TK</span>
+			<span id='TR' onclick='v9454163(this);' title='Turkish'>TR</span>
+			<span id='UG' onclick='v9454163(this);' title='Uyghur'>UG</span>
+			<span id='UK' onclick='v9454163(this);' title='Ukrainian'>UK</span>
+			<span id='UZ' onclick='v9454163(this);' title='Uzbek'>UZ</span>
+			<span id='WO' onclick='v9454163(this);' title='Wolof'>WO</span>
+			<span id='ZH' onclick='v9454163(this);' title='Chinese'>ZH</span>
+			<br>
+
+
+			<div id='v9438663'>
+				<a target='_blank' href='https://www.tawkit.net/docs/'>&#9654; DOCUMENTATION</a><br>
+				<a target='_blank' href='https://www.tawkit.net/#updates'>&#9654; UPDATES</a><br>
+				<a target='_blank' href='https://www.tawkit.net/#License'>&#9654; LICENSE</a>
+				<div id='v9466763'><input type='checkbox' id='v9438763' onchange='v9343363()'>&nbsp;&nbsp;<label for='v9438763' id='v9438863'>AUTO-START</label></div>
+			</div>
+
+        </div>
+
+
+
+        <div id='v9493563'>
+            <div id='v9369663' 	onclick="v9424563(); v9381463();"></div>
+            <div id='v9349263' 	onclick="v9424563(); v9410463('v9369763');"></div>
+            <div id='v9381563' 		onclick="v9424563(); v9410463('v9438963');"></div>
+            <div id='v9381663' 		onclick="v9424563(); v9410463('v9410563');"></div>
+            <div id='v9369863' 	onclick="v9424563(); v9410463('v9395863');"></div>
+            <div id='v9343463' 	onclick="v9424563(); v9410463('v9381763');"></div>
+            <div id='v9357663' 	onclick="v9424563(); v9410463('v9410663');"></div>
+            <div id='v9424663' 		onclick="v9424563(); v9410463('v9454263');"></div>
+            <div id='v9395963'></div>
+            <div id='v9357763' 	onclick="v9424563(); v9410463('v9381863');"></div>
+            <div id='v9357863' 	onclick="v9424563(); v9410463('v9381963');"></div>
+            <div id='v9439063' 			onclick="v9424563(); v9410463('v9466863');"></div>
+            <div id='v9424763' 		onclick="v9424563(); v9410463('v9454363');"></div>
+            <div id='v9382063' 		onclick="v9424563(); v9410463('v9424863');"></div>
+            <div id='v9439163' 			onclick="v9424563(); v9410463('v9466963');"></div>
+        </div>
+
+        <div id='v9439263'>
+            <div id='v9369963'></div>
+        </div>
+    </div>
+
+</div>
+
+<div id='v9454463' class='v9343563'>
+    <div class='v9493663'>
+        <div class='v9493763'></div>
+        <div class='v9493863'><span onclick='v9424963(this.parentNode);'>&#10006;</span></div>
+    </div>
+    <div id='v9493963' class='v9467063 v9482763'><span id='v9454563'></span>
+        <br>
+        <br><span id='v9410763'></span>
+        <div id='v9370063'></div>
+    </div>
+</div>
+
+
+<div id='v9438963' class='v9343563'>
+
+    <div class='v9493663'>
+        <div class='v9493763'></div>
+        <div class='v9493863'><span class='v9482863' onclick="v9424463('v9410863', 0);">&#9650;</span> &nbsp; <span class='v9482863' onclick="v9424463('v9410863', 1);">&#9660;</span> &nbsp;&nbsp;&nbsp; <span onclick='v9424963(this.parentNode);'>&#10006;</span></div>
+    </div>
+
+    <div id='v9410863' class='v9467063'>
+        <div>&#9673; <span id='v9370163' onclick="v9357963();"></span></div>
+        <div>&#9673; <span id='v9396063'></span>&nbsp;<span class='v9494063' id='v9410963' onclick='v9358063();'></span></div>
+    	<div id='v9482963' onclick='v9332563();'>&#9673; <span id='v9396163'></span> &#9660; </div>
+    	<div id='v9483063'>
+    		<span id='e7af' onclick="v9382163('af');">AF</span>
+    		<span id='e7am' onclick="v9382163('am');">AM</span>
+    		<span id='e7ar' onclick="v9382163('ar');">AR</span>
+    		<span id='e7az' onclick="v9382163('az');">AZ</span>
+    		<span id='e7bg' onclick="v9382163('bg');">BG</span>
+    		<span id='e7bn' onclick="v9382163('bn');">BN</span>
+    		<span id='e7bs' onclick="v9382163('bs');">BS</span>
+    		<span id='e7da' onclick="v9382163('da');">DA</span>
+    		<span id='e7de' onclick="v9382163('de');">DE</span>
+    		<span id='e7en' onclick="v9382163('en');">EN</span>
+    		<span id='e7es' onclick="v9382163('es');">ES</span>
+    		<span id='e7fa' onclick="v9382163('fa');">FA</span>
+    		<span id='e7fr' onclick="v9382163('fr');">FR</span>
+    		<span id='e7ha' onclick="v9382163('ha');">HA</span>
+    		<span id='e7hi' onclick="v9382163('hi');">HI</span>
+    		<span id='e7id' onclick="v9382163('id');">ID</span>
+    		<span id='e7it' onclick="v9382163('it');">IT</span>
+    		<span id='e7ja' onclick="v9382163('ja');">JA</span>
+    		<span id='e7kk' onclick="v9382163('kk');">KK</span>
+    		<span id='e7ko' onclick="v9382163('ko');">KO</span>
+    		<span id='e7ku' onclick="v9382163('ku');">KU</span>
+    		<span id='e7ky' onclick="v9382163('ky');">KY</span>
+    		<span id='e7ms' onclick="v9382163('ms');">MS</span>
+    		<span id='e7nl' onclick="v9382163('nl');">NL</span>
+    		<span id='e7no' onclick="v9382163('no');">NO</span>
+    		<span id='e7om' onclick="v9382163('om');">OM</span>
+    		<span id='e7pa' onclick="v9382163('pa');">PA</span>
+    		<span id='e7ps' onclick="v9382163('ps');">PS</span>
+    		<span id='e7pt' onclick="v9382163('pt');">PT</span>
+    		<span id='e7ru' onclick="v9382163('ru');">RU</span>
+    		<span id='e7sd' onclick="v9382163('sd');">SD</span>
+    		<span id='e7si' onclick="v9382163('si');">SI</span>
+    		<span id='e7so' onclick="v9382163('so');">SO</span>
+    		<span id='e7sq' onclick="v9382163('sq');">SQ</span>
+    		<span id='e7sv' onclick="v9382163('sv');">SV</span>
+    		<span id='e7sw' onclick="v9382163('sw');">SW</span>
+    		<span id='e7ta' onclick="v9382163('ta');">TA</span>
+    		<span id='e7tg' onclick="v9382163('tg');">TG</span>
+    		<span id='e7th' onclick="v9382163('th');">TH</span>
+    		<span id='e7tk' onclick="v9382163('tk');">TK</span>
+    		<span id='e7tl' onclick="v9382163('tl');">TL</span>
+    		<span id='e7tr' onclick="v9382163('tr');">TR</span>
+    		<span id='e7ug' onclick="v9382163('ug');">UG</span>
+    		<span id='e7uk' onclick="v9382163('uk');">UK</span>
+    		<span id='e7ur' onclick="v9382163('ur');">UR</span>
+    		<span id='e7uz' onclick="v9382163('uz');">UZ</span>
+    		<span id='e7wo' onclick="v9382163('wo');">WO</span>
+    		<span id='e7zh' onclick="v9382163('zh');">ZH</span>
+    	</div>
+
+        <hr>
+        <div><input type='checkbox' id='v9396263' 	onchange='v9425063()'> &nbsp;				<label for='v9396263'>علم فلسطين | Palestine flag</label></div>
+        <div><input type='checkbox' id='v9454663' 		onchange='v9411063()'> &nbsp;				<label for='v9454663' id='v9439363'></label></div>
+        <div><input type='checkbox' id='v9425163' 		onchange='v9382263()'> &nbsp;			<label for='v9425163' id='v9411163'></label></div>
+        <div><input type='checkbox' id='v9358163'	onchange='v9337763()'> &nbsp;		<label for='v9358163'><span id='v9439463'></span> "00:00:00" </label></div>
+        <div><input type='checkbox' id='v9382363' 	onchange='v9349363()'> &nbsp;		<label for='v9382363' id='v9334663'></label></div>
+        <div><input type='checkbox' id='v9358263' onchange='v9338163()'> &nbsp;		<label for='v9358263' id='v9439563'></label></div>
+        <div><input type='checkbox' id='v9358363'	onchange='v9343263()'> &nbsp;		<label for='v9358363' id='v9370263'></label></div>
+        <div><input type='checkbox' id='v9411263' 	onchange='v9369563()'> &nbsp;			<label for='v9411263' id='v9396363'></label></div>
+        <div><input type='checkbox' id='v9396463' 	onchange='v9337863()'> &nbsp;		<label for='v9396463' id='v9396563'></label></div>
+        <div><input type='checkbox' id='v9358463' onchange='v9349463()'> &nbsp;		<label for='v9358463' id='v9349563'></label></div>
+        <div><input type='checkbox' id='v9358563' onchange='v9338263()'> &nbsp;		<label for='v9358563' id='v9454763'></label></div>
+        <div><input type='checkbox' id='v9396663' 	onchange='v9358663()'> &nbsp;			<label for='v9396663' id='v9382463'></label></div>
+        <div><input type='checkbox' id='v9382563' 	onchange='v9338363()'> &nbsp;		<label for='v9382563' id='v9358763'></label></div>
+        <div><input type='checkbox' id='v9467163' 		onchange='v9370363()'> &nbsp;			<label for='v9467163' id='v9396763'></label></div>
+        <div><input type='checkbox' id='v9370463' 	onchange='v9342963()'> &nbsp;		<label for='v9370463' id='v9358863'></label></div>
+        <div><input type='checkbox' id='v9454863' 		onchange='v9370563()'> &nbsp;			<label for='v9454863' id='v9358963'></label></div>
+        <div><input type='checkbox' id='v9439663' 		onchange='v9359063()'> &nbsp;			<label for='v9439663' id='v9396863'></label></div>
+        <div><input type='checkbox' id='v9396963' 	onchange='v9357463()'> &nbsp;			<label for='v9396963' id='v9382663'></label></div>
+        <div><input type='checkbox' id='v9439763' 		onchange='v9349663()'> &nbsp;		<label for='v9439763' id='v9439863'></label></div>
+        <div><input type='checkbox' id='v9359163' onchange='v9338463()'> &nbsp;		<label for='v9359163' id='v9359263'></label></div>
+        <div><input type='checkbox' id='v9397063' 	onchange='v9359363()'> &nbsp;			<label for='v9397063' id='v9349763'></label></div>
+        <div><input type='checkbox' id='v9397163' 	onchange='v9349863()'> &nbsp;		<label for='v9397163' id='v9343663'></label></div>
+		<div><input type='checkbox' id='v9411363' 	onchange='v9329263()'> &nbsp;	<label for='v9411363' id='v9370663'></label></div>
+
+
+        <hr>
+        <div><input type='checkbox' id='v9411463' 	onchange='v9334763()'>&nbsp;&nbsp;<span id='v9338563'></span></div>
+        <div id='v9397263' class='v9425263' onclick='v9382763();'></div>
+
+        <div><input type='checkbox' id='v9397363' 	onchange='v9359463()'> &nbsp;<label for='v9397363' id='v9397463'></label></div>
+        <hr>
+
+        <div><input type='checkbox' id='v9467263' onchange='v9359563();'> &nbsp;<span id='v9382863' ></span> <span class='v9494063' id='v9454963' onclick='v9397563();'></span></div>
+        <div><input type='checkbox' id='v9467363' onchange='v9359663();'> &nbsp;<span id='v9382963' ></span> <span class='v9494063' id='v9455063' onclick='v9397663();'></span></div>
+        <hr>
+        <div>
+            <input type='checkbox' id='v9411563' onchange='v9334863()'> &nbsp;<label for='v9411563' id='v9439963'></label>
+        </div>
+        <div>
+            <input type='checkbox' id='v9425363' onchange='v9338663()'> &nbsp;<label for='v9425363' id='v9411663'></label>
+        </div>
+        <div>
+            <input type='checkbox' id='v9411763' onchange='v9334963()'> &nbsp;<label for='v9411763' id='v9397763'></label>
+        </div>
+
+        <hr>
+        <div id='v9467463'></div>
+        <table id='v9467563'>
+            <tr>
+                <th class='v9349963'>TEXT</th>
+                <th>TIMES</th>
+                <th>CLOCK</th>
+                <th class='v9349963'>AZKAR</th>
+            </tr>
+            <tr>
+
+                <td class='v9349963'>
+                    <input type='radio' onclick="v9411863('Amiri');" 		name='Rfon1' id='APPUI-Amiri'><label for='APPUI-Amiri'> Amiri</label>
+                    <br>
+                    <input type='radio' onclick="v9411863('AmiriBold');" 	name='Rfon1' id='APPUI-AmiriBold'><label for='APPUI-AmiriBold'> AmiriBold</label>
+                    <br>
+                    <input type='radio' onclick="v9411863('CORDOBA');" 	name='Rfon1' id='APPUI-CORDOBA'><label for='APPUI-CORDOBA'> CORDOBA</label>
+                    <br>
+                    <input type='radio' onclick="v9411863('Andalus');" 	name='Rfon1' id='APPUI-Andalus'><label for='APPUI-Andalus'> Andalus</label>
+                    <br>
+                    <input type='radio' onclick="v9411863('KSA');" 		name='Rfon1' id='APPUI-KSA'><label for='APPUI-KSA'> KSA</label>
+                    <br>
+                    <input type='radio' onclick="v9411863('Taha');" 		name='Rfon1' id='APPUI-Taha'><label for='APPUI-Taha'> TAHA</label>
+                    <br>
+                    <input type='radio' onclick="v9411863('SULTAN');" 	name='Rfon1' id='APPUI-SULTAN'><label for='APPUI-SULTAN'> SULTAN</label>
+                    <br>
+                    <input type='radio' onclick="v9411863('STC');" 		name='Rfon1' id='APPUI-STC'><label for='APPUI-STC'> STC</label>
+                    <br>
+                    <input type='radio' onclick="v9411863('FODA');" 		name='Rfon1' id='APPUI-FODA'><label for='APPUI-FODA'> FODA</label>
+                    <br>
+                </td>
+                <td>
+                    <input type='radio' onclick="v9397863('FreeSerifBold');" name='Rfon2' id='TIMES-FreeSerifBold'><label for='TIMES-FreeSerifBold'> FreeSerifBold</label>
+                    <br>
+                    <input type='radio' onclick="v9397863('FreeSans');" 		name='Rfon2' id='TIMES-FreeSans'><label for='TIMES-FreeSans'> FreeSans</label>
+                    <br>
+                    <input type='radio' onclick="v9397863('FreeSansBold');" 	name='Rfon2' id='TIMES-FreeSansBold'><label for='TIMES-FreeSansBold'> FreeSansBold</label>
+                    <br>
+                    <input type='radio' onclick="v9397863('FONTO');" 		name='Rfon2' id='TIMES-FONTO'><label for='TIMES-FONTO'> FONTO</label>
+                    <br>
+                    <input type='radio' onclick="v9397863('SULTAN');" 		name='Rfon2' id='TIMES-SULTAN'><label for='TIMES-SULTAN'> SULTAN</label>
+                    <br>
+                    <input type='radio' onclick="v9397863('STC');" 			name='Rfon2' id='TIMES-STC'><label for='TIMES-STC'> STC</label>
+                    <br>
+                </td>
+                <td>
+                    <input type='radio' onclick="v9383063('FreeSerifBold');"	name='Rfon3' id='CLOCK-FreeSerifBold'><label for='CLOCK-FreeSerifBold'> FreeSerifBold</label><br>
+                    <input type='radio' onclick="v9383063('FreeSans');" 		name='Rfon3' id='CLOCK-FreeSans'><label for='CLOCK-FreeSans'> FreeSans</label><br>
+                    <input type='radio' onclick="v9383063('FreeSansBold');" 	name='Rfon3' id='CLOCK-FreeSansBold'><label for='CLOCK-FreeSansBold'> FreeSansBold</label><br>
+                    <input type='radio' onclick="v9383063('FONTO');" 			name='Rfon3' id='CLOCK-FONTO'><label for='CLOCK-FONTO'> FONTO</label><br>
+                    <input type='radio' onclick="v9383063('SULTAN');" 			name='Rfon3' id='CLOCK-SULTAN'><label for='CLOCK-SULTAN'> SULTAN</label><br>
+                     <input type='radio' onclick="v9383063('STC');" 			name='Rfon3' id='CLOCK-STC'><label for='CLOCK-SULTAN'> STC</label><br>
+                </td>
+                <td class='v9349963'>
+                    <input type='radio' onclick="v9397963('Taha');" 		name='Rfon4' id='AZKAR-Taha'><label for='AZKAR-Taha'> TAHA</label><br>
+                    <input type='radio' onclick="v9397963('SULTAN');" 	name='Rfon4' id='AZKAR-SULTAN'><label for='AZKAR-SULTAN'> SULTAN</label><br>
+                    <input type='radio' onclick="v9397963('FODA');" 		name='Rfon4' id='AZKAR-FODA'><label for='AZKAR-SULTAN'> FODA</label><br>
+                </td>
+            </tr>
+        </table>
+
+
+        <br>
+        <hr>
+
+        <br>
+        <br>
+        <br>
+        <br>
+
+    </div>
+
+</div>
+
+
+
+<div id='v9381763' class='v9343563'>
+
+    <div class='v9493663'>
+        <div class='v9493763'></div>
+        <div class='v9493863'><span onclick="v9424463('v9411963', 0);">&#9650;</span> &nbsp; <span onclick="v9424463('v9411963', 1);">&#9660;</span> &nbsp;&nbsp;&nbsp; <span onclick='v9424963(this.parentNode);'>&#10006;</span></div>
+    </div>
+
+	    <div id='v9411963' class='v9467063'>
+
+			        <div id='v9412063' class='v9425263'>Export your settings to a file that you modify as needed.<br></div>
+			        <button id='v9425463' class='v9494163' onclick='v9343763();'>&#8673; &nbsp; Export Settings</button><br>
+			        <div id='v9412163' class='v9425263 v9510563 v9494263'>_</div>
+			        <hr>
+
+
+			        <div id='v9359763' class='v9425263'>
+				        You upload your settings file on <a target='_blank' href='https://settings.tawkit.net'>https://settings.tawkit.net</a><br>
+				        You'll get ID of your settings file to enter here.
+			        </div>
+			        <button class='v9494163' onclick='v9330363();'>&#8675; &nbsp; Import By ID</button>
+			        <div id='v9338763' class='v9425263 v9510563 v9494263'>_</div>
+			        <hr>
+
+
+			        <div id='v9359863' class='v9425263'>
+				        Import your settings file from this device<br>
+						<div class='v9510563 v9494263' >
+						<label for='v9425563'>Select your settings file to Import : </label> &nbsp; <input id='v9425563' name='v9425563' type='file'>
+						</div>
+			        </div>
+			        <button class='v9494163' onclick='v9329463();'>&#8675; &nbsp; Import Local file</button><br>
+			        <div id='v9327963' class='v9425263 v9510563 v9494263'>_</div>
+			        <br>
+
+	    </div>
+
+</div>
+
+
+
+<div id='v9454263' class='v9343563'>
+
+    <div class='v9493663'>
+        <div class='v9493763'></div>
+        <div class='v9493863'><span onclick='v9424963(this.parentNode);'>&#10006;</span></div>
+    </div>
+
+    <div class='v9467063'>
+
+        <table class='v9494363'>
+            <tr>
+            <td><div id='v9370763'></div><div id='v9467663' class='v9425263'></div></td>
+            <td><span onclick="v9357263()">&#9664;</span> &nbsp; <span onclick="v9357163()">&#9654;</span></td>
+            <td id='v9455163'></td>
+            </tr>
+        </table>
+
+        	<input type='radio' onclick='v9412263(0);' name='eBGs_' id='BGsType_0'>&nbsp;<label for='BGsType_0' id='v9350063'></label>
+        	<hr>
+        	<input type='radio' onclick='v9412263(1);' name='eBGs_' id='BGsType_1'>&nbsp;<label for='BGsType_1' id='v9338863'></label>
+        	<span class='v9425263'>(Click on prayer to change)</span>
+					        <table class='v9467763'>
+					            <tr>
+					                <td id='jc0' onclick='v9350163(0);'></td>
+					                <td id='jc1' onclick='v9350163(1);'></td>
+					                <td id='jc2' onclick='v9350163(2);'></td>
+					                <td id='jc3' onclick='v9350163(3);'></td>
+					                <td id='jc4' onclick='v9350163(4);'></td>
+					                <td id='jc5' onclick='v9350163(5);'></td>
+					            </tr>
+					            <tr><td id='jm0'>0</td><td id='jm1'>0</td><td id='jm2'>0</td><td id='jm3'>0</td><td id='jm4'>0</td><td id='jm5'>0</td></tr>
+					        </table>
+        	<hr>
+        	<input type='radio' onclick='v9412263(2);' name='eBGs_' id='BGsType_2'>&nbsp;<label for='BGsType_2' id='v9350263'></label>
+        	<span class='v9425263'>(Click on the day to change)</span>
+					        <table class='v9467863'>
+					            <tr>
+					                <td id='jw0' onclick='v9425663(0);'></td>
+					                <td id='jw1' onclick='v9425663(1);'></td>
+					                <td id='jw2' onclick='v9425663(2);'></td>
+					                <td id='jw3' onclick='v9425663(3);'></td>
+					                <td id='jw4' onclick='v9425663(4);'></td>
+					                <td id='jw5' onclick='v9425663(5);'></td>
+					                <td id='jw6' onclick='v9425663(6);'></td>
+					            </tr>
+					            <tr><td id='jj0'>0</td><td id='jj1'>0</td><td id='jj2'>0</td><td id='jj3'>0</td><td id='jj4'>0</td><td id='jj5'>0</td><td id='jj6'>0</td></tr>
+					        </table>
+        	<hr>
+        	<input type='radio' onclick='v9412263(3);' name='eBGs_' id='BGsType_3'>&nbsp;<label for='BGsType_3' id='v9335063'></label><br>
+        	<span class='v9425263'>(Click on themes numbers to change)</span>&nbsp;&nbsp;<span id='v9383163' onclick='v9370863();'></span>
+        	<br>
+    </div>
+
+</div>
+
+
+
+<div id='v9466863' class='v9343563'>
+
+    <div class='v9493663'>
+        <div class='v9493763'></div>
+        <div class='v9493863'><span onclick="v9424463('v9440063', 0);">&#9650;</span> &nbsp; <span onclick="v9424463('v9440063', 1);">&#9660;</span> &nbsp;&nbsp;&nbsp; <span onclick='v9424963(this.parentNode);'>&#10006;</span></div>
+    </div>
+
+    <div id='v9440063' class='v9467063'>
+        <input type='checkbox' id='v9412363' onchange='v9343863()'> &nbsp;<label for='v9412363' id='v9455263'> </label><br>
+        <input type='checkbox' id='v9343963' onchange='v9328063()'> &nbsp;<label for='v9343963' id='v9440163'></label><br>
+        <input type='checkbox' id='v9359963' onchange='v9328163()'> &nbsp;<label for='v9359963' id='v9455363'> </label><br>
+        <input type='checkbox' id='v9383263' onchange='v9350363()'> &nbsp;<label for='v9383263' id='v9383363'> </label><br>
+        <hr>
+        <input type='checkbox' id='v9370963' onchange='v9371063()'> &nbsp;<label for='v9370963' id='v9398063'> </label><br>
+        <input type='checkbox' id='v9371163' onchange='v9371263()'> &nbsp;<label for='v9371163' id='v9425763'> </label><br>
+        <input type='checkbox' id='v9371363' onchange='v9371463()'> &nbsp;<label for='v9371363' id='v9383463'> </label><br>
+        <input type='checkbox' id='v9371563' onchange='v9371663()'> &nbsp;<label for='v9371563' id='v9412463'> </label><br>
+        <br>
+        <br>
+        <br>
+        <br>
+    </div>
+
+</div>
+
+
+
+<div id='v9454363' class='v9343563'>
+
+    <div class='v9493663'>
+        <div class='v9493763'></div>
+        <div class='v9493863'><span onclick="v9424463('v9425863', 0);">&#9650;</span> &nbsp; <span onclick="v9424463('v9425863', 1);">&#9660;</span> &nbsp;&nbsp;&nbsp; <span onclick='v9424963(this.parentNode);'>&#10006;</span></div>
+    </div>
+
+    <div id='v9425863' class='v9467063'>
+        <div><input type='checkbox' id='v9398163' onchange='v9338963()'> &nbsp; <label for='v9398163' id='v9440263'></label></div>
+        <div><input type='checkbox' id='v9383563' onchange='v9350463()'> &nbsp; <label for='v9383563' id='v9371763'></label></div>
+        <div onclick='v9344063();'><span id='v9360063'></span> <span class='v9467963' id='v9371863'>0</span></div>
+        <div onclick='v9344163();'><span id='v9360163'></span> <span class='v9467963' id='v9371963'>0</span></div>
+        <hr>
+        <div dir='ltr'>
+	            <div class='v9425263' >
+	            Slides are additional messages that you can display on the screen after Azkar/Sabah/Masaa. They are shown/hidden until the next Prayer.
+	            To test the Slides, click 3 times on DOHR name. To stop the Slides, click on Screen.
+	            <br>
+	            <b>PICTURES and HTTP URLS SUPPORT</b> : You can also add your own pictures as slides,
+	            you write the filename of your slide as new slide text.
+	            Your picture file must be .jpg or .png and located in the "/slides/" folder.
+	            </div>
+            <hr>
+            <button class='v9468063 v9482863' onclick='v9440363();'>Add Slide : TEXT or File or LINK (https://...)</button>
+            <div class='v9425263'>Tip : Add the character "|" in your messages to create a new line</div>
+            <table id='v9425963' dir='ltr'></table>
+        </div>
+        <br>
+        <br>
+        <br>
+    </div>
+
+</div>
+
+
+<div id='v9410663' class='v9343563'>
+
+    <div class='v9493663'>
+        <div class='v9493763'></div>
+        <div class='v9493863'><span onclick="v9424463('v9383663', 0);">&#9650;</span> &nbsp; <span onclick="v9424463('v9383663', 1);">&#9660;</span> &nbsp;&nbsp;&nbsp; <span onclick='v9424963(this.parentNode);'>&#10006;</span></div>
+    </div>
+
+    <div id='v9383663' class='v9467063'>
+        <div><input type='checkbox' id='v9383763' onchange='v9339063()'> &nbsp; <label for='v9383763' id='v9426063'>Reminders | برمجة التنبيهات الصوتية </label></div>
+        <hr>
+        <div dir='ltr'>
+	            <div class='v9425263' >
+					<div dir='rtl' >
+					أضف تنبيهات صوتية قبل أو بعد أوقات الصلاة، بما في ذلك منتصف الليل والثلث الأخير. تظهر الرسالة لمدة 12 ثانية . فيما يلي كلمات الاستعمال :<br> 
+					FAJR, SHRQ, DOHR, ASSR, MGRB, ISHA, NISF, TULT<br>
+					BEFORE / AFTER . المزيد من المعومات في : <a href='https://www.tawkit.net/docs/#sound-alerts' target='_blank'>tawkit.net/docs</a>
+					</div>
+				<hr>
+			    Set sound alerts before/after prayer times, including midnight and last third of night. Alert shows a 12-second message. 
+			    <a href='#' onclick="v9372063();">Test sound here</a> <br>
+			    Keywords : FAJR, SHRQ, DOHR, ASSR, MGRB, ISHA, NISF, TULT<br>
+			    Actions : BEFORE or AFTER and put your message between (), example :<br>
+			    15.BEFORE.FAJR.(Salam Alaykoum)<br>
+	            </div>
+            <hr>
+
+            <button class='v9468063 v9482863' onclick='v9398263();'>Add Reminder</button>
+            <table id='v9383863' dir='ltr'></table>
+        </div>
+        <br>
+        <br>
+        <br>
+    </div>
+
+</div>
+
+
+
+<div id='v9381863' class='v9343563'>
+
+    <div class='v9493663'>
+        <div class='v9493763'></div>
+        <div class='v9493863'><span onclick="v9424463('v9360263', 0);">&#9650;</span> &nbsp; <span onclick="v9424463('v9360263', 1);">&#9660;</span> &nbsp;&nbsp;&nbsp; <span onclick='v9424963(this.parentNode);'>&#10006;</span></div>
+    </div>
+
+    <div id='v9360263' class='v9467063'>
+        <div><input type='checkbox' id='v9360363' onchange='v9330463()'> &nbsp; <label for='v9360363' id='v9440463'> </label></div>
+        <div><input type='checkbox' id='v9398363' onchange='v9360463()'> &nbsp; <label for='v9398363' id='v9412563'> </label></div>
+        <div><input type='checkbox' id='v9372163' onchange='v9383963()'> &nbsp; <label for='v9372163' id='v9426163'> </label></div>
+        <div><input type='checkbox' id='v9372263' onchange='v9384063()'> &nbsp; <label for='v9372263' id='v9426263'> </label></div>
+
+        <hr>
+        <div id='v9330563'>&#9673; &nbsp; Prayers Adjustements</div>
+        <table class='v9467763'>
+            <tr>
+                <td id='jcD8AAD8B7D8A8D'></td>
+                <td id='jc98AD98220D985'></td>
+                <td id='jcD8ACD8A7D986D'></td>
+                <td id='jc98A3C62723E77'></td>
+                <td id='jc77772E7461776'></td>
+                <td id='jcB69742E6E6574'></td>
+            </tr>
+            <tr>
+                <td id='v9440563'></td>
+                <td id='v9440663'></td>
+                <td id='v9440763'></td>
+                <td id='v9455463'></td>
+                <td id='v9398463'></td>
+                <td id='v9440863'></td>
+            </tr>
+            <tr>
+                <td>
+                    <button class='v9412663' onclick="v9426363('FAJR')">-</button>&nbsp;
+                    <button class='v9412663' onclick="v9426463('FAJR')">+</button>
+                </td>
+                <td>
+                    <button class='v9412663' onclick="v9426363('SHRQ')">-</button>&nbsp;
+                    <button class='v9412663' onclick="v9426463('SHRQ')">+</button>
+                </td>
+                <td>
+                    <button class='v9412663' onclick="v9426363('DOHR')">-</button>&nbsp;
+                    <button class='v9412663' onclick="v9426463('DOHR')">+</button>
+                </td>
+                <td>
+                    <button class='v9412663' onclick="v9426363('ASR')">-</button>&nbsp;
+                    <button class='v9412663' onclick="v9426463('ASR')">+</button>
+                </td>
+                <td>
+                    <button class='v9412663' onclick="v9426363('MAGHRIB')">-</button>&nbsp;
+                    <button class='v9412663' onclick="v9426463('MAGHRIB')">+</button>
+                </td>
+                <td>
+                    <button class='v9412663' onclick="v9426363('ISHA')">-</button>&nbsp;
+                    <button class='v9412663' onclick="v9426463('ISHA')">+</button>
+                </td>
+            </tr>
+        </table>
+
+
+        <hr>
+        <div id='v9335163'></div>
+        <table id='v9398563'>
+            <tr>
+                <td id='v9455563'></td>
+                <td id='v9426563'></td>
+                <td><button class='v9412663' onclick="v9412763('FAJR')">-</button></td>
+                <td><button class='v9412663' onclick="v9412863('FAJR')">+</button></td>
+                <td>FIXED : <button id='v9494463' class='v9426663' onclick='v9426763();'></button></td>
+            </tr>
+
+            <tr>
+                <td id='v9455663'></td>
+                <td id='v9426863'></td>
+                <td><button class='v9412663' onclick="v9412763('SHRQ')">-</button></td>
+                <td><button class='v9412663' onclick="v9412863('SHRQ')">+</button></td>
+                <td></td>
+            </tr>
+
+
+            <tr>
+                <td id='v9455763'></td>
+                <td id='v9426963'></td>
+                <td><button class='v9412663' onclick="v9412763('DOHR')">-</button></td>
+                <td><button class='v9412663' onclick="v9412863('DOHR')">+</button></td>
+                <td>FIXED : <button id='v9494563' class='v9426663' onclick='v9427063();'></button></td>
+            </tr>
+
+            <tr>
+                <td id='v9455863'></td>
+                <td id='v9440963'></td>
+                <td><button class='v9412663' onclick="v9412763('ASR')">-</button></td>
+                <td><button class='v9412663' onclick="v9412863('ASR')">+</button></td>
+                <td>FIXED : <button id='v9506663' class='v9426663' onclick='v9441063();'></button></td>
+            </tr>
+
+            <tr>
+                <td id='v9455963'></td>
+                <td id='v9384163'></td>
+                <td><button class='v9412663' onclick="v9412763('MAGHRIB')">-</button></td>
+                <td><button class='v9412663' onclick="v9412863('MAGHRIB')">+</button></td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td id='v9456063'></td>
+                <td id='v9427163'></td>
+                <td><button class='v9412663' onclick="v9412763('ISHA')">-</button></td>
+                <td><button class='v9412663' onclick="v9412863('ISHA')">+</button></td>
+                <td>FIXED : <button id='v9494663' class='v9426663' onclick='v9427263();'></button></td>
+            </tr>
+        </table>
+
+        <hr>
+
+		<span id='v9412963'></span><br>
+		<button id='v9483163' class='v9426663 v9494763' onclick='v9413063();'></button>
+		<div><input type='checkbox' id='v9384263' onchange='v9369463()'> &nbsp;<label for='v9384263' id='v9413163'></label></div>
+		<div><input type='checkbox' id='v9427363' onchange='v9339163()'> &nbsp;<label for='v9427363' id='v9350563'></label></div>
+
+
+
+        <hr>
+        <div id='v9372363'></div>
+        <hr>
+        <div onclick='v9372463();'><span id='v9413263'></span> <span class='v9467963' id='v9339263'>0</span></div>
+        <hr>
+        <div onclick='v9384363();'><span id='v9384463'></span> <span class='v9467963' id='v9344263'>0</span></div>
+        <hr>
+
+        <br>
+        <br>
+        <br>
+        <br>
+    </div>
+
+</div>
+
+
+
+<div id='v9381963' class='v9343563'>
+
+    <div class='v9493663'>
+        <div class='v9493763'></div>
+        <div class='v9493863'><span onclick="v9424463('v9427463', 0);">&#9650;</span> &nbsp; <span onclick="v9424463('v9427463', 1);">&#9660;</span> &nbsp;&nbsp;&nbsp; <span onclick='v9424963(this.parentNode);'>&#10006;</span></div>
+    </div>
+
+    <div id='v9427463' class='v9467063'>
+
+
+        <div><input type='checkbox' id='v9427563' onchange='v9384563()'> &nbsp;<label for='v9427563' id='v9494863'></label></div>
+        <hr>
+        <div><input type='checkbox' id='v9350663'	onchange='v9327363()'> &nbsp;<label for='v9350663' id='v9372563'></label></div>
+        <div><input type='checkbox' id='v9360563'		onchange='v9328263()'> &nbsp;<label for='v9360563' 	 id='v9384663'></label></div>
+        <hr>
+        <div><input type='checkbox' id='v9350763' onchange='v9360663()'> &nbsp;<label for='v9350763' id='v9494963'></label></div>
+        <div><input type='checkbox' id='v9350863' onchange='v9360763()'> &nbsp;<label for='v9350863' id='v9495063'></label></div>
+
+		<hr>
+
+        <table class='v9495163'>
+            <tr>
+                <td id='v9483263'></td>
+                <td id='v9495263'></td>
+                <td id='v9332663'>0</td>
+                <td>
+                    <button class='v9412663' onclick="v9344363()">-</button>
+                </td>
+                <td>
+                    <button class='v9412663' onclick="v9350963()">+</button>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td id='v9495363'></td>
+                <td id='v9335263'>0</td>
+                <td>
+                    <button class='v9412663' onclick="v9351063()">-</button>
+                </td>
+                <td>
+                    <button class='v9412663' onclick="v9360863()">+</button>
+                </td>
+            </tr>
+        </table>
+
+
+
+
+        <div id='v9495463'></div>
+
+
+
+        <table class='v9495563'>
+            <tr>
+                <td id='v9483363'> </td>
+                <td id='v9384763'>0</td>
+                <td>
+                    <button class='v9412663' onclick="v9372663('FAJR')">-</button>
+                </td>
+                <td>
+                    <button class='v9412663' onclick="v9372763('FAJR')">+</button>
+                </td>
+            </tr>
+        </table>
+
+
+
+        <table class='v9495563'>
+            <tr>
+                <td id='v9483463'> </td>
+                <td id='v9384863'>0</td>
+                <td>
+                    <button class='v9412663' onclick="v9372663('DOHR')">-</button>
+                </td>
+                <td>
+                    <button class='v9412663' onclick="v9372763('DOHR')">+</button>
+                </td>
+            </tr>
+        </table>
+
+
+        <table class='v9495563'>
+            <tr>
+                <td id='v9495663'> </td>
+                <td id='v9398663'>0</td>
+                <td>
+                    <button class='v9412663' onclick="v9372663('ASR')">-</button>
+                </td>
+                <td>
+                    <button class='v9412663' onclick="v9372763('ASR')">+</button>
+                </td>
+            </tr>
+        </table>
+
+
+        <table class='v9495563'>
+            <tr>
+                <td id='v9441163'> </td>
+                <td id='v9351163'>0</td>
+                <td>
+                    <button class='v9412663' onclick="v9372663('MAGHRIB')">-</button>
+                </td>
+                <td>
+                    <button class='v9412663' onclick="v9372763('MAGHRIB')">+</button>
+                </td>
+            </tr>
+        </table>
+
+
+
+        <table class='v9495563'>
+            <tr>
+                <td id='v9483563'> </td>
+                <td id='v9384963'>0</td>
+                <td>
+                    <button class='v9412663' onclick="v9372663('ISHA')">-</button>
+                </td>
+                <td>
+                    <button class='v9412663' onclick="v9372763('ISHA')">+</button>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+
+</div>
+
+
+
+
+<div id='v9369763' class='v9343563'>
+
+    <div class='v9493663'>
+        <div class='v9493763'><span id='v9506763'></span></div>
+        <div class='v9493863'><span onclick="v9424463('v9398763', 0);">&#9650;</span> &nbsp; <span onclick="v9424463('v9398763', 1);">&#9660;</span> &nbsp;&nbsp;&nbsp; <span onclick="v9424963(this.parentNode);">&#10006;</span></div>
+    </div>
+
+    <div id='v9398763' class='v9467063'>
+
+           <input type='checkbox' id='v9495763' onchange='v9385063()'> &nbsp;<label for='v9495763' id='v9385163'></label>
+           <hr>
+
+            <div class='v9441263'>
+                <div id='v9456163'></div>
+                <button id='v9385263' class='v9495863' onclick='v9344463();'>_country</button>
+                <button id='v9427663' class='v9495863' onclick='v9372863();'>_city</button>
+                <br><br>
+                <input type='checkbox' id='v9344563' onchange='v9332763()'> &nbsp;<label for='v9344563' id='v9344663'></label>
+                <hr>
+                <div>
+                    <div id='v9456263'></div>
+                    <span id='v9456363'></span>
+                    <div class='v9425263'>
+                    more info here : <a href='https://www.tawkit.net/docs/#mosque-location-settings' target='_blank'>tawkit.net/docs/#mosque-location-settings</a>
+                    </div>
+                    
+                </div>
+            </div>
+
+
+    </div>
+
+</div>
+
+
+
+<div id='v9395863' class='v9343563'>
+
+    <div class='v9493663'>
+        <div class='v9493763'></div>
+        <div class='v9493863'><span onclick="v9424463('v9372963', 0);">&#9650;</span> &nbsp; <span onclick="v9424463('v9372963', 1);">&#9660;</span> &nbsp;&nbsp;&nbsp; <span onclick="v9424963(this.parentNode);">&#10006;</span></div>
+    </div>
+
+    <div id='v9372963' class='v9467063'>
+
+	    <div><input type='checkbox' id='v9385363' onchange='v9351263()'> &nbsp; <label for='v9385363' id='v9344763'> </label></div>
+	    <div id='v9373063' class='v9425263'></div>
+	    <hr>
+
+			    <div id='v9344863'>
+
+
+					<input type='file' id='v9385463' accept='image/png, image/jpeg, image/jpg' style='display:none;'>
+
+					<div id='v9385563' class='v9425263'>Use pictures *.jpg or *.png (less than 1MB per file)</div>
+					<div id='v9398863' class='v9425263'></div>
+						<table class='v9441363'>
+						<tr>
+							<td>
+								<div>Display Background</div>
+								<button class='v9441463'  onclick='v9360963(0);'>Upload</button>
+								<button class='v9441463'  onclick='v9361063(0);'> X </button>
+								<img id='cjpf0' alt='' src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=='>
+							</td>
+							<td>
+								<div>5min Azkar Picture</div>
+								<button class='v9441463'  onclick='v9360963(1);'>Upload</button>
+								<button class='v9441463'  onclick='v9361063(1);'> X </button>
+								<img id='cjpf1' alt='' src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=='>
+							</td>
+						</tr>
+						</table>
+
+			    </div>
+
+
+
+
+    </div>
+
+</div>
+
+
+
+<div id='v9410563' class='v9343563'>
+
+    <div class='v9493663'>
+        <div class='v9493763'></div>
+        <div class='v9493863'><span onclick="v9424463('v9373163', 0);">&#9650;</span> &nbsp; <span onclick="v9424463('v9373163', 1);">&#9660;</span> &nbsp;&nbsp;&nbsp; <span onclick="v9424963(this.parentNode);">&#10006;</span></div>
+    </div>
+
+    <div id='v9373163' class='v9467063'>
+
+        <div id='v9398963'></div>
+        <div id='v9344963' class='v9425263'></div>
+        <div><input type='checkbox' id='v9373263' onchange='v9329363()'> &nbsp;<label for='v9373263' id='v9361163'> </label></div>
+        <button class='v9468063 v9482863' onclick='v9351363();' id='v9456463'></button>
+        <div id='v9361263' class='v9425263'></div>
+        <div><input type='checkbox' id='v9361363' onchange='v9345063()'> &nbsp;<label for='v9361363' id='v9361463'> </label></div>
+        <br>
+        <table id='v9483663' dir='ltr'></table>
+        <br>
+        <br>
+        <br>
+        <br>
+    </div>
+
+</div>
+
+
+<div id='v9424863' class='v9343563'>
+
+    <div class='v9493663'>
+        <div class='v9493763'></div>
+        <div class='v9493863'><span onclick="v9424463('v9456563', 0);">&#9650;</span> &nbsp; <span onclick="v9424463('v9456563', 1);">&#9660;</span> &nbsp;&nbsp;&nbsp; <span onclick='v9424963(this.parentNode);'>&#10006;</span></div>
+    </div>
+
+
+	    <div id='v9456563' class='v9467063'>
+	        <div id='v9373363'></div>
+	        <div id='v9385663' class='v9425263'></div>
+
+				<ul class='v9494263'>
+				  <li>Click on clock to switch bewteen Mini and Full clock.</li>
+				  <li>Click on Hadith bottom screen, to switch between Ahadith and scrolling announcements.</li>
+				  <li>Click on Iqama of Isha, to change Ahadith.</li>
+				  <li>Click on Next-Pray TIME to make prayers names in middle (HR/VR)</li>
+				  <li>Click on Next-Pray TEXT to Enlarge Next-Pray Counter</li>
+				  <li>DoubleClick on logo to activate the black-screen.<br>( Click on black-screen to remove it).</li>
+				  <li>Click on Mosque name in HR-mode, to change the date to the up-right and Mosque name to the left.</li>
+				  <li>Click on tawkit name in HR-mode (left-bottom), to switch between 5 or 6 cells prayers display.</li>
+				  <li>Click 7 times on weather-forecasts to reset app settings and restart. (Useful when app is blocked with bad settings).</li>
+				  <li>DoubleClick on Iqama of Fajr to show Iqama-with-time On/Off</li>
+				  <li>Click on tomorrow-fajr-time 3 times, to show/hide Ayats</li>
+				</ul>
+
+	    </div>
+
+</div>
+
+
+<div id='v9466963' class='v9343563'>
+
+    <div class='v9493663'>
+        <div class='v9493763'></div>
+        <div class='v9493863'><span onclick="v9424463('v9441563', 0);">&#9650;</span> &nbsp; <span onclick="v9424463('v9441563', 1);">&#9660;</span> &nbsp;&nbsp;&nbsp; <span onclick='v9424963(this.parentNode);'>&#10006;</span></div>
+    </div>
+
+    <div id='v9441563' class='v9467063'>
+
+        <div><input type='checkbox' id='v9427763' onchange='v9373463()'> &nbsp;<label for='v9427763' id='v9483763'></label></div>
+        <div><input type='checkbox' id='v9441663' onchange='v9329563()'> &nbsp;<label for='v9441663' id='v9427863'></label></div>
+        <div class='v9482763'>
+            <button onclick='v9361563();'>GPS Position By Browser</button>
+            <br>
+            <button onclick='v9399063();'>GPS Position Manually</button>
+            <br>
+            <br> GPS Position : <span id='v9483863'></span>
+        </div>
+        <br>
+        <div class='v9425263 v9482763 v9494263'>7 DAYS WEATHER FORECASTS.
+            <br>Auto-updates when application starts and at midnight.
+            <br>This service needs Internet at least once a week.
+            <br>
+            <br>Service by : Open-Meteo.com</div>
+        <br>
+        <br>
+        <br>
+
+    </div>
+
+</div>
+
+
+<img id='v9427963' alt='' src='./images/tvPointer.png'>
+
+
+<div id='v9468163'>
+    <div id='v9441763'></div>
+    <input id='v9441863' type='text' inputmode='text' tabindex='0' value=""><br>
+    <button class='v9456663' onclick='v9373563();'>CANCEL</button>
+    <button class='v9456663' onclick='v9428063();'>OK</button>
+</div>
+
+
+
+
+<div id='v9413363' class='v9343563'>
+    <div class='v9493663'>
+        <div class='v9493763'></div>
+        <div class='v9493863'>
+        <span class='v9482863' onclick="v9424463('v9385763', 0);">&#9650;</span> &nbsp;
+        <span class='v9482863' onclick="v9424463('v9385763', 1);">&#9660;</span> &nbsp;&nbsp;&nbsp;
+        <span onclick='v9424963(this.parentNode);'>&#10006;</span></div>
+    </div>
+    <div id='v9385763' class='v9468263'></div>
+</div>
+
+
+<div id='v9456763' class='v9343563'>
+    <div class='v9493663'>
+        <div class='v9493763'></div>
+        <div class='v9493863'><span class='v9482863' onclick="v9424463('v9428163', 0);">&#9650;</span> &nbsp; <span class='v9482863' onclick="v9424463('v9428163', 1);">&#9660;</span> &nbsp;&nbsp;&nbsp; <span onclick='v9424963(this.parentNode);'>&#10006;</span></div>
+    </div>
+    <div id='v9428163' class='v9468263'></div>
+</div>
+
+
+<div id='v9373663'></div>
+
+
+
+
+
+<script src='m2body.js?s=963'></script>
+</body>
+
+
+</html>
+

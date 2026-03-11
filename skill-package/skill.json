@@ -1,0 +1,43 @@
+{
+  "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "en-US": {
+          "name": "Tawkit Prayer Times",
+          "summary": "Islamic prayer times display for Echo Show with Hanafi Asr",
+          "description": "Tawkit displays the 5 daily Islamic prayer times for Apex, NC on your Echo Show screen. Features a countdown to the next prayer, Adhan audio at prayer times, and rotating Hadiths and Quran verses. Uses Hanafi madhab for Asr calculation.",
+          "examplePhrases": [
+            "Alexa, open Tawkit",
+            "Alexa, ask Tawkit for prayer times",
+            "Alexa, ask Tawkit what is the next prayer"
+          ],
+          "keywords": ["prayer", "salah", "islam", "muslim", "adhan", "fajr", "isha", "prayer times", "mosque", "quran", "hadith", "hanafi"]
+        }
+      },
+      "isAvailableWorldwide": true,
+      "testingInstructions": "Open the skill and check that prayer times display correctly on Echo Show.",
+      "category": "RELIGION_AND_SPIRITUALITY",
+      "distributionCountries": ["US", "CA", "GB"]
+    },
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "sourceDir": "lambda"
+        },
+        "interfaces": [
+          { "type": "ALEXA_PRESENTATION_APL" }
+        ]
+      }
+    },
+    "manifestVersion": "1.0",
+    "permissions": [],
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "usesPersonalInfo": false,
+      "isChildDirected": false,
+      "isExportCompliant": true,
+      "containsAds": false,
+      "usesHealthInfo": false
+    }
+  }
+}

@@ -1,0 +1,150 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Tawkit Echo — Alexa Prayer Times Skill (Hanafi, Apex NC)
+
+# ─── GLOBALS ──────────────────────────────────────────────────────────────────
+Globals:
+  Function:
+    Runtime:    nodejs20.x
+    Timeout:    10
+    MemorySize: 256
+    Environment:
+      Variables:
+        PRAYER_CITY:     !Ref PrayerCity
+        PRAYER_STATE:    !Ref PrayerState
+        PRAYER_COUNTRY:  !Ref PrayerCountry
+        PRAYER_METHOD:   !Ref PrayerMethod
+        PRAYER_SCHOOL:   !Ref PrayerSchool
+        PRAYER_TIMEZONE: !Ref PrayerTimezone
+        SKILL_ID:        !Ref AlexaSkillId
+        S3_BUCKET:       !Ref ContentBucket
+
+# ─── PARAMETERS ───────────────────────────────────────────────────────────────
+Parameters:
+  AlexaSkillId:
+    Type:        String
+    Description: Alexa Skill ID (from developer.amazon.com)
+
+  PrayerCity:
+    Type:    String
+    Default: Apex
+  PrayerState:
+    Type:    String
+    Default: NC
+  PrayerCountry:
+    Type:    String
+    Default: US
+  PrayerMethod:
+    Type:    String
+    Default: "2"
+    Description: "AlAdhan calculation method — 2=ISNA (North America)"
+  PrayerSchool:
+    Type:    String
+    Default: "1"
+    Description: "Juristic school — 1=Hanafi (later Asr), 0=Shafi"
+  PrayerTimezone:
+    Type:    String
+    Default: America/New_York
+
+# ─── RESOURCES ────────────────────────────────────────────────────────────────
+Resources:
+
+  # ── S3 Bucket for content.json and Adhan audio ──────────────────────────────
+  ContentBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "tawkit-echo-content-${AWS::AccountId}"
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls:       true
+        BlockPublicPolicy:     true
+        IgnorePublicAcls:      true
+        RestrictPublicBuckets: true
+
+  # ── Main Lambda Function ─────────────────────────────────────────────────────
+  TawkitFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: tawkit-echo
+      CodeUri:      ./lambda
+      Handler:      index.handler
+      Description:  "Tawkit Echo — Alexa skill handler + prayer time refresh"
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref ContentBucket
+      Events:
+        # Alexa Skill trigger
+        AlexaSkillTrigger:
+          Type: AlexaSkill
+          Properties:
+            SkillId: !Ref AlexaSkillId
+
+        # Midnight cache reset (00:00 Eastern = 05:00 UTC)
+        MidnightReset:
+          Type: Schedule
+          Properties:
+            Name:        TawkitMidnightReset
+            Description: "Clear prayer times cache at midnight Eastern"
+            Schedule:    cron(0 5 * * ? *)
+            Input:       '{"detail-type":"TawkitMidnightReset"}'
+            Enabled:     true
+
+        # Prayer time EventBridge triggers
+        # NOTE: These are placeholder fixed times.
+        # In v2, these will be dynamically updated by Lambda after each fetch.
+        # For Apex NC (Eastern) — approximate average times — adjust seasonally.
+
+        FajrTrigger:
+          Type: Schedule
+          Properties:
+            Name:        TawkitPrayerFajr
+            Description: "Fajr prayer time trigger — Apex NC"
+            Schedule:    cron(15 10 * * ? *)
+            Input:       '{"detail-type":"TawkitPrayerTime","prayerName":"Fajr"}'
+            Enabled:     true
+
+        DhuhrTrigger:
+          Type: Schedule
+          Properties:
+            Name:        TawkitPrayerDhuhr
+            Description: "Dhuhr prayer time trigger — Apex NC"
+            Schedule:    cron(31 17 * * ? *)
+            Input:       '{"detail-type":"TawkitPrayerTime","prayerName":"Dhuhr"}'
+            Enabled:     true
+
+        AsrTrigger:
+          Type: Schedule
+          Properties:
+            Name:        TawkitPrayerAsr
+            Description: "Asr prayer time trigger — Apex NC (Hanafi)"
+            Schedule:    cron(45 21 * * ? *)
+            Input:       '{"detail-type":"TawkitPrayerTime","prayerName":"Asr"}'
+            Enabled:     true
+
+        MaghribTrigger:
+          Type: Schedule
+          Properties:
+            Name:        TawkitPrayerMaghrib
+            Description: "Maghrib prayer time trigger — Apex NC"
+            Schedule:    cron(15 23 * * ? *)
+            Input:       '{"detail-type":"TawkitPrayerTime","prayerName":"Maghrib"}'
+            Enabled:     true
+
+        IshaTrigger:
+          Type: Schedule
+          Properties:
+            Name:        TawkitPrayerIsha
+            Description: "Isha prayer time trigger — Apex NC"
+            Schedule:    cron(45 0 * * ? *)
+            Input:       '{"detail-type":"TawkitPrayerTime","prayerName":"Isha"}'
+            Enabled:     true
+
+# ─── OUTPUTS ──────────────────────────────────────────────────────────────────
+Outputs:
+  TawkitFunctionArn:
+    Description: Lambda function ARN
+    Value:       !GetAtt TawkitFunction.Arn
+  ContentBucketName:
+    Description: S3 bucket for content and audio
+    Value:       !Ref ContentBucket

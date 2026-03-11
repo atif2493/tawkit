@@ -1,0 +1,43 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "tawkit",
+      "modelConfiguration": {
+        "fallbackIntentSensitivity": { "level": "LOW" }
+      },
+      "intents": [
+        {
+          "name": "PrayerTimesIntent",
+          "slots": [],
+          "samples": [
+            "prayer times",
+            "show prayer times",
+            "what are the prayer times",
+            "salah times",
+            "namaz times",
+            "awqat al salah",
+            "show me the prayers"
+          ]
+        },
+        {
+          "name": "NextPrayerIntent",
+          "slots": [],
+          "samples": [
+            "next prayer",
+            "what is the next prayer",
+            "when is the next prayer",
+            "next salah",
+            "next namaz",
+            "how long until the next prayer",
+            "when do I pray next"
+          ]
+        },
+        { "name": "AMAZON.HelpIntent",   "samples": [] },
+        { "name": "AMAZON.StopIntent",   "samples": [] },
+        { "name": "AMAZON.CancelIntent", "samples": [] },
+        { "name": "AMAZON.FallbackIntent", "samples": [] }
+      ],
+      "types": []
+    }
+  }
+}

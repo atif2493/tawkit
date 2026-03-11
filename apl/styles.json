@@ -1,0 +1,19 @@
+{
+  "description": "Shared APL styles for Tawkit Echo (FDD color palette)",
+  "colors": {
+    "colorBackground": "#0D1B2A",
+    "colorGold": "#D4AF37",
+    "colorWhite": "#FFFFFF",
+    "colorDimmed": "#4A4A4A",
+    "colorAmber": "#FFA500",
+    "colorRed": "#FF4444",
+    "colorHadith": "#E8E8E8",
+    "colorAccent": "#4ECDC4",
+    "colorCardBg": "#1A2A3A",
+    "colorNextHighlight": "#2A3F54"
+  },
+  "dimensions": {
+    "prayerCardWidth": "18vw",
+    "prayerCardHeight": "22vh"
+  }
+}

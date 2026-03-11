@@ -1,0 +1,273 @@
+{
+  "type": "APL",
+  "version": "2024.1",
+  "theme": "dark",
+  "import": [
+    { "name": "alexa-layouts", "version": "1.7.0" },
+    { "name": "alexa-styles",  "version": "1.6.0" }
+  ],
+  "resources": [
+    {
+      "colors": {
+        "colorBackground":   "${tawkitData.properties.colors.background}",
+        "colorGold":         "${tawkitData.properties.colors.gold}",
+        "colorAccent":       "${tawkitData.properties.colors.accent}",
+        "colorHadith":       "${tawkitData.properties.colors.hadithText}",
+        "colorCardBg":       "${tawkitData.properties.colors.cardBg}",
+        "colorNextBg":       "${tawkitData.properties.colors.nextHighlight}"
+      },
+      "dimensions": {
+        "prayerCardWidth":  "18vw",
+        "prayerCardHeight": "22vh"
+      }
+    }
+  ],
+  "layouts": {},
+  "mainTemplate": {
+    "parameters": ["tawkitData"],
+    "item": {
+      "type": "Container",
+      "width":  "100vw",
+      "height": "100vh",
+      "backgroundColor": "@colorBackground",
+      "direction": "column",
+      "paddingLeft":  "3vw",
+      "paddingRight": "3vw",
+      "paddingTop":   "2vh",
+      "items": [
+
+        // ── ROW 1: Header ──────────────────────────────────────────────────────
+        {
+          "type": "Container",
+          "direction": "row",
+          "justifyContent": "spaceBetween",
+          "alignItems": "center",
+          "width": "100%",
+          "height": "12vh",
+          "items": [
+            {
+              "type": "Text",
+              "text":      "${tawkitData.properties.appName}",
+              "fontSize":  "36dp",
+              "fontWeight": "700",
+              "color":     "@colorAccent",
+              "fontFamily": "Noto Naskh Arabic"
+            },
+            {
+              "type": "Container",
+              "direction": "column",
+              "alignItems": "end",
+              "items": [
+                {
+                  "type": "Text",
+                  "text":     "${tawkitData.properties.gregorianDate}",
+                  "fontSize": "18dp",
+                  "color":    "#AAAAAA"
+                },
+                {
+                  "type": "Text",
+                  "text":     "${tawkitData.properties.hijriDate}",
+                  "fontSize": "20dp",
+                  "fontWeight": "600",
+                  "color":    "@colorGold",
+                  "fontFamily": "Noto Naskh Arabic",
+                  "textAlign": "end"
+                }
+              ]
+            }
+          ]
+        },
+
+        // ── ROW 2: Prayer Times Grid (5 cards) ────────────────────────────────
+        {
+          "type": "Container",
+          "direction": "row",
+          "justifyContent": "spaceAround",
+          "alignItems": "center",
+          "width": "100%",
+          "height": "30vh",
+          "spacing": "8dp",
+          "items": [
+            {
+              "type": "Container",
+              "direction": "column",
+              "alignItems": "center",
+              "justifyContent": "center",
+              "width":  "@prayerCardWidth",
+              "height": "@prayerCardHeight",
+              "borderRadius": "12dp",
+              "backgroundColor": "${item.isNext ? '@colorNextBg' : '@colorCardBg'}",
+              "borderWidth":  "${item.isNext ? 2 : 0}",
+              "borderColor":  "@colorGold",
+              "data": "${tawkitData.properties.prayers}",
+              "items": [
+                {
+                  "type": "Text",
+                  "text":       "${data.nameAr}",
+                  "fontSize":   "20dp",
+                  "fontWeight": "600",
+                  "color": "${data.status == 'past' ? '#4A4A4A' : data.isNext ? '#FFFFFF' : '#D4AF37'}",
+                  "fontFamily": "Noto Naskh Arabic",
+                  "textAlign":  "center"
+                },
+                {
+                  "type": "Text",
+                  "text":       "${data.time}",
+                  "fontSize":   "32dp",
+                  "fontWeight": "700",
+                  "color": "${data.status == 'past' ? '#4A4A4A' : data.isNext ? '#FFFFFF' : '#D4AF37'}",
+                  "textAlign":  "center",
+                  "spacing":    "4dp"
+                },
+                {
+                  "type": "Text",
+                  "when":       "${data.isNext}",
+                  "text":       "▶",
+                  "fontSize":   "14dp",
+                  "color":      "@colorAccent",
+                  "textAlign":  "center",
+                  "spacing":    "4dp"
+                },
+                {
+                  "type": "Text",
+                  "when":       "${data.status == 'past'}",
+                  "text":       "✓",
+                  "fontSize":   "14dp",
+                  "color":      "#4A4A4A",
+                  "textAlign":  "center"
+                },
+                {
+                  "type": "Text",
+                  "when":       "${data.key == 'asr'}",
+                  "text":       "حنفي",
+                  "fontSize":   "11dp",
+                  "color":      "#888888",
+                  "fontFamily": "Noto Naskh Arabic",
+                  "textAlign":  "center"
+                }
+              ]
+            }
+          ]
+        },
+
+        // ── ROW 3: Next Prayer Countdown ──────────────────────────────────────
+        {
+          "type": "Container",
+          "direction": "row",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "width": "100%",
+          "height": "14vh",
+          "backgroundColor": "@colorCardBg",
+          "borderRadius": "12dp",
+          "paddingLeft":  "20dp",
+          "paddingRight": "20dp",
+          "spacing": "12dp",
+          "items": [
+            {
+              "type": "Text",
+              "text":     "⏱",
+              "fontSize": "28dp"
+            },
+            {
+              "type": "Text",
+              "text":     "Next:",
+              "fontSize": "22dp",
+              "color":    "#AAAAAA"
+            },
+            {
+              "type": "Text",
+              "text":     "${tawkitData.properties.nextPrayer.nameAr}",
+              "fontSize": "26dp",
+              "fontWeight": "700",
+              "color":    "#FFFFFF",
+              "fontFamily": "Noto Naskh Arabic"
+            },
+            {
+              "type": "Text",
+              "text":     "${tawkitData.properties.nextPrayer.time}",
+              "fontSize": "22dp",
+              "color":    "@colorGold"
+            },
+            {
+              "type": "Text",
+              "text":     "—",
+              "fontSize": "22dp",
+              "color":    "#555555"
+            },
+            {
+              "type": "Text",
+              "text":     "${tawkitData.properties.nextPrayer.countdown}",
+              "fontSize": "36dp",
+              "fontWeight": "700",
+              "color":    "${tawkitData.properties.nextPrayer.countdownColor}"
+            }
+          ]
+        },
+
+        // ── ROW 4: Hadith / Quran Verse (from Tawkit content) ─────────────────
+        {
+          "type": "Container",
+          "direction": "column",
+          "justifyContent": "center",
+          "alignItems": "center",
+          "width": "100%",
+          "height": "28vh",
+          "backgroundColor": "@colorCardBg",
+          "borderRadius": "12dp",
+          "paddingLeft":  "24dp",
+          "paddingRight": "24dp",
+          "paddingTop":   "12dp",
+          "paddingBottom": "12dp",
+          "spacing": "2vh",
+          "items": [
+            {
+              "type": "Text",
+              "text":       "${tawkitData.properties.content.text}",
+              "fontSize":   "22dp",
+              "color":      "@colorHadith",
+              "fontFamily": "Noto Naskh Arabic",
+              "textAlign":  "center",
+              "maxLines":   3,
+              "direction":  "RTL"
+            },
+            {
+              "type": "Text",
+              "when":     "${tawkitData.properties.content.ref != ''}",
+              "text":     "— ${tawkitData.properties.content.ref}",
+              "fontSize": "16dp",
+              "color":    "@colorGold",
+              "fontFamily": "Noto Naskh Arabic",
+              "textAlign": "center"
+            }
+          ]
+        },
+
+        // ── ROW 5: Footer ─────────────────────────────────────────────────────
+        {
+          "type": "Container",
+          "direction": "row",
+          "justifyContent": "spaceBetween",
+          "alignItems": "center",
+          "width": "100%",
+          "height": "8vh",
+          "items": [
+            {
+              "type": "Text",
+              "text":     "${tawkitData.properties.cityName} · ${tawkitData.properties.madhab}",
+              "fontSize": "14dp",
+              "color":    "#555555"
+            },
+            {
+              "type": "Text",
+              "text":     "تـوقيت",
+              "fontSize": "14dp",
+              "color":    "#333333",
+              "fontFamily": "Noto Naskh Arabic"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,23 @@
+var JS_CITIES_DATA =
+[
+"mr.elb-el-jmel.",
+"mr.aioun.",
+"mr.akjoujt.",
+"mr.aleg.",
+"mr.arafat.",
+"mr.atar.",
+"mr.barkewol.",
+"mr.chinguetti.",
+"mr.dar-naim.",
+"mr.kaedi.",
+"mr.kiffa.",
+"mr.nema.",
+"mr.nouadhibou.",
+"mr.nouakchott.",
+"mr.rosso.",
+"mr.selibaby.",
+"mr.tekane.",
+"mr.tevragh-zeina.",
+"mr.tidjikja.",
+"mr.zouerate.",
+];

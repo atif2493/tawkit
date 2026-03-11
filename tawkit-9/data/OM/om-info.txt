@@ -1,0 +1,26 @@
+In OM list, there are some files duplicated ( it's normal ) , example  :
+
+wtimes-om.barka-al billa.js   (with space)
+and
+wtimes-om.barka-al-billa.js   (without-space)
+
+
+The good files from tawkit version 9.63 should be lowser-case-and-without-spaces !
+
+If duplicated with space still exists in this folder, 
+it's because of compatibilty with users used old files with space on old version of tawkit,
+and app 9.63 must find that file to not make error while starting !
+
+This is the reason why duplicates files exists ...
+
+Same thing with files using _  the good files use the - 
+
+------------------------
+
+Future version Isha'Allah will delete dupliacte files and use only lower-case-files-without-spaces
+and app will control user-saved-settings to avoid file not found ...
+
+
+
+
+

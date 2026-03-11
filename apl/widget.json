@@ -1,0 +1,46 @@
+{
+  "type": "APL",
+  "version": "2024.1",
+  "theme": "dark",
+  "import": [
+    { "name": "alexa-layouts", "version": "1.7.0" },
+    { "name": "alexa-styles", "version": "1.6.0" }
+  ],
+  "resources": [],
+  "layouts": {},
+  "mainTemplate": {
+    "parameters": ["payload"],
+    "item": {
+      "type": "Container",
+      "width": "100vw",
+      "height": "100vh",
+      "backgroundColor": "${payload.data.properties.colors.background}",
+      "direction": "column",
+      "paddingTop": "2vh",
+      "paddingLeft": "2vw",
+      "paddingRight": "2vw",
+      "items": [
+        {
+          "type": "Text",
+          "text": "تـوقيت",
+          "fontSize": "24dp",
+          "fontWeight": "700",
+          "color": "${payload.data.properties.colors.accent}",
+          "fontFamily": "Noto Naskh Arabic"
+        },
+        {
+          "type": "Text",
+          "text": "${payload.data.properties.nextPrayer.nameEn} in ${payload.data.properties.nextPrayer.countdown}",
+          "fontSize": "20dp",
+          "color": "${payload.data.properties.colors.gold}"
+        },
+        {
+          "type": "Text",
+          "text": "${payload.data.properties.gregorianDate}",
+          "fontSize": "14dp",
+          "color": "#AAAAAA"
+        }
+      ]
+    }
+  }
+}
