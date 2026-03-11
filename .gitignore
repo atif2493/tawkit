@@ -21,6 +21,10 @@ Thumbs.db
 *.swp
 *.swo
 
+# Large binaries (GitHub 100MB limit)
+*.apk
+Archive Files/*.apk
+
 # Logs and temp
 *.log
 npm-debug.log*
