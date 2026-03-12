@@ -55,6 +55,15 @@ function buildApiUrl(dateStr) {
 }
 
 function parseApiResponse(data) {
+  if (!data || !data.data || !data.data.timings || !data.data.date) {
+    throw new Error('AlAdhan API response missing required fields (data.timings or data.date)');
+  }
+  const requiredTimings = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+  for (const key of requiredTimings) {
+    if (!data.data.timings[key]) {
+      throw new Error(`AlAdhan API response missing timing: ${key}`);
+    }
+  }
   const t = data.data.timings;
   const d = data.data.date;
 

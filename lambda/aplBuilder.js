@@ -46,6 +46,7 @@ function buildDatasource(prayerTimes, timezone) {
       hijriDate: prayerTimes.hijri?.formattedAr || '',
       hijriDateEn: prayerTimes.hijri?.formatted || '',
       gregorianDate: prayerTimes.gregorian?.formatted || '',
+      currentTime: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: timezone }),
       prayers: [
         { key: 'fajr', nameAr: 'الفجر', nameEn: 'Fajr', time: formatTo12Hr(prayerTimes.fajr), time24: prayerTimes.fajr, status: statuses.fajr, isNext: statuses.fajr === 'next' },
         { key: 'dhuhr', nameAr: 'الظهر', nameEn: 'Dhuhr', time: formatTo12Hr(prayerTimes.dhuhr), time24: prayerTimes.dhuhr, status: statuses.dhuhr, isNext: statuses.dhuhr === 'next' },
@@ -77,14 +78,14 @@ function buildAplDirective(datasource, content, aplDocument) {
   const document = aplDocument || loadAplDocument();
   const directive = {
     type: 'Alexa.Presentation.APL.RenderDocument',
-    token: 'tawkitMainScreen',
-    datasources: { tawkitData: datasource },
+    token: 'myPrayerTimeMainScreen',
+    datasources: { myPrayerTimeData: datasource },
   };
 
   if (document) {
     directive.document = document;
   } else {
-    directive.document = { type: 'Link', src: 'doc://alexa/apl/documents/tawkitMainScreen' };
+    directive.document = { type: 'Link', src: 'doc://alexa/apl/documents/myPrayerTimeMainScreen' };
   }
   return directive;
 }

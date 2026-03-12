@@ -1,5 +1,5 @@
 /**
- * index.js — Tawkit Echo Alexa Skill
+ * index.js — My Prayer Time Alexa Skill
  * Main Lambda handler. Handles LaunchRequest, PrayerTimesIntent, NextPrayerIntent,
  * EventBridge (prayer time + midnight reset), Help/Stop/Cancel, SessionEnded, Error.
  */
@@ -72,7 +72,7 @@ const HelpIntentHandler = {
            Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.HelpIntent';
   },
   handle(handlerInput) {
-    const speech = 'Tawkit shows prayer times for ' + CONFIG.city + '. You can say: show prayer times, or what is the next prayer.';
+    const speech = 'My Prayer Time shows prayer times for ' + CONFIG.city + '. You can say: show prayer times, or what is the next prayer.';
     return handlerInput.responseBuilder.speak(speech).getResponse();
   },
 };
@@ -106,16 +106,20 @@ const ErrorHandler = {
 };
 
 exports.handler = async (event, context) => {
-  if (event.source === 'aws.events' || event['detail-type'] === 'TawkitPrayerTime') {
+  if (event.source === 'aws.events' || event['detail-type'] === 'MyPrayerTimePrayerTime') {
     const { clearCache } = require('./prayerService');
     clearCache();
     await getPrayerTimes(true);
     return { statusCode: 200, body: 'Cache refreshed' };
   }
-  if (event['detail-type'] === 'TawkitMidnightReset') {
+  if (event['detail-type'] === 'MyPrayerTimeMidnightReset') {
     const { clearCache } = require('./prayerService');
     clearCache();
     return { statusCode: 200, body: 'Cache cleared' };
+  }
+
+  if (!process.env.SKILL_ID) {
+    console.warn('[index] WARNING: SKILL_ID env var is not set — request signature validation disabled');
   }
 
   const skill = Alexa.SkillBuilders.custom()

@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Tawkit Echo — Alexa Prayer Times Skill (Hanafi, Apex NC)
+Description: My Prayer Time — Alexa Prayer Times Skill (Hanafi, Apex NC)
 
 # ─── GLOBALS ──────────────────────────────────────────────────────────────────
 Globals:
@@ -53,7 +53,7 @@ Resources:
   ContentBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "tawkit-echo-content-${AWS::AccountId}"
+      BucketName: !Sub "my-prayer-time-content-${AWS::AccountId}"
       VersioningConfiguration:
         Status: Enabled
       PublicAccessBlockConfiguration:
@@ -63,13 +63,13 @@ Resources:
         RestrictPublicBuckets: true
 
   # ── Main Lambda Function ─────────────────────────────────────────────────────
-  TawkitFunction:
+  MyPrayerTimeFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: tawkit-echo
+      FunctionName: my-prayer-time
       CodeUri:      ./lambda
       Handler:      index.handler
-      Description:  "Tawkit Echo — Alexa skill handler + prayer time refresh"
+      Description:  "My Prayer Time — Alexa skill handler + prayer time refresh"
       Policies:
         - S3ReadPolicy:
             BucketName: !Ref ContentBucket
@@ -84,10 +84,10 @@ Resources:
         MidnightReset:
           Type: Schedule
           Properties:
-            Name:        TawkitMidnightReset
+            Name:        MyPrayerTimeMidnightReset
             Description: "Clear prayer times cache at midnight Eastern"
             Schedule:    cron(0 5 * * ? *)
-            Input:       '{"detail-type":"TawkitMidnightReset"}'
+            Input:       '{"detail-type":"MyPrayerTimeMidnightReset"}'
             Enabled:     true
 
         # Prayer time EventBridge triggers
@@ -98,53 +98,53 @@ Resources:
         FajrTrigger:
           Type: Schedule
           Properties:
-            Name:        TawkitPrayerFajr
-            Description: "Fajr prayer time trigger — Apex NC"
-            Schedule:    cron(15 10 * * ? *)
-            Input:       '{"detail-type":"TawkitPrayerTime","prayerName":"Fajr"}'
+            Name:        MyPrayerTimeFajr
+            Description: "Fajr prayer time trigger — Apex NC (05:12 ET = 10:12 UTC)"
+            Schedule:    cron(12 10 * * ? *)
+            Input:       '{"detail-type":"MyPrayerTimePrayerTime","prayerName":"Fajr"}'
             Enabled:     true
 
         DhuhrTrigger:
           Type: Schedule
           Properties:
-            Name:        TawkitPrayerDhuhr
-            Description: "Dhuhr prayer time trigger — Apex NC"
+            Name:        MyPrayerTimeDhuhr
+            Description: "Dhuhr prayer time trigger — Apex NC (12:31 ET = 17:31 UTC)"
             Schedule:    cron(31 17 * * ? *)
-            Input:       '{"detail-type":"TawkitPrayerTime","prayerName":"Dhuhr"}'
+            Input:       '{"detail-type":"MyPrayerTimePrayerTime","prayerName":"Dhuhr"}'
             Enabled:     true
 
         AsrTrigger:
           Type: Schedule
           Properties:
-            Name:        TawkitPrayerAsr
-            Description: "Asr prayer time trigger — Apex NC (Hanafi)"
-            Schedule:    cron(45 21 * * ? *)
-            Input:       '{"detail-type":"TawkitPrayerTime","prayerName":"Asr"}'
+            Name:        MyPrayerTimeAsr
+            Description: "Asr prayer time trigger — Apex NC Hanafi (16:15 ET = 21:15 UTC)"
+            Schedule:    cron(15 21 * * ? *)
+            Input:       '{"detail-type":"MyPrayerTimePrayerTime","prayerName":"Asr"}'
             Enabled:     true
 
         MaghribTrigger:
           Type: Schedule
           Properties:
-            Name:        TawkitPrayerMaghrib
-            Description: "Maghrib prayer time trigger — Apex NC"
-            Schedule:    cron(15 23 * * ? *)
-            Input:       '{"detail-type":"TawkitPrayerTime","prayerName":"Maghrib"}'
+            Name:        MyPrayerTimeMaghrib
+            Description: "Maghrib prayer time trigger — Apex NC (18:19 ET = 23:19 UTC)"
+            Schedule:    cron(19 23 * * ? *)
+            Input:       '{"detail-type":"MyPrayerTimePrayerTime","prayerName":"Maghrib"}'
             Enabled:     true
 
         IshaTrigger:
           Type: Schedule
           Properties:
-            Name:        TawkitPrayerIsha
-            Description: "Isha prayer time trigger — Apex NC"
+            Name:        MyPrayerTimeIsha
+            Description: "Isha prayer time trigger — Apex NC (19:45 ET = 00:45 UTC+1)"
             Schedule:    cron(45 0 * * ? *)
-            Input:       '{"detail-type":"TawkitPrayerTime","prayerName":"Isha"}'
+            Input:       '{"detail-type":"MyPrayerTimePrayerTime","prayerName":"Isha"}'
             Enabled:     true
 
 # ─── OUTPUTS ──────────────────────────────────────────────────────────────────
 Outputs:
-  TawkitFunctionArn:
+  MyPrayerTimeFunctionArn:
     Description: Lambda function ARN
-    Value:       !GetAtt TawkitFunction.Arn
+    Value:       !GetAtt MyPrayerTimeFunction.Arn
   ContentBucketName:
     Description: S3 bucket for content and audio
     Value:       !Ref ContentBucket

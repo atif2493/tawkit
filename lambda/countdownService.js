@@ -8,8 +8,8 @@ const PRAYER_NAMES = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 const PRAYER_NAMES_AR = { Fajr: 'الفجر', Dhuhr: 'الظهر', Asr: 'العصر', Maghrib: 'المغرب', Isha: 'العشاء' };
 
 function timeToMinutes(timeStr) {
-  const hours = parseInt(timeStr.substr(0, 2));
-  const minutes = parseInt(timeStr.substr(3, 2));
+  const hours = parseInt(timeStr.substring(0, 2));
+  const minutes = parseInt(timeStr.substring(3, 5));
   return (hours * 60) + minutes;
 }
 
@@ -24,13 +24,13 @@ function addMinutesToTime(timeStr, offsetMinutes) {
 
 function addOneHour(timeStr) {
   const parts = timeStr.split(':');
-  const hh = ('0' + (parseInt(parts[0]) + 1)).slice(-2);
+  const hh = ('0' + ((parseInt(parts[0]) + 1) % 24)).slice(-2);
   return `${hh}:${parts[1]}`;
 }
 
 function subtractOneHour(timeStr) {
   const parts = timeStr.split(':');
-  const hh = ('0' + (parseInt(parts[0]) - 1)).slice(-2);
+  const hh = ('0' + ((parseInt(parts[0]) + 23) % 24)).slice(-2);
   return `${hh}:${parts[1]}`;
 }
 

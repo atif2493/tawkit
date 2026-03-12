@@ -13,7 +13,7 @@ const {
   formatCountdown,
   getCountdownUrgency,
   getPrayerStatuses,
-} = require('../countdownService');
+} = require('./countdownService');
 
 // ─── timeToMinutes (ported from Tawkit v9347263) ──────────────────────────────
 describe('timeToMinutes', () => {

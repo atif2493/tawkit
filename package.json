@@ -1,10 +1,10 @@
 {
-  "name": "tawkit-echo",
+  "name": "my-prayer-time",
   "version": "1.0.0",
-  "description": "Tawkit Echo — Islamic Prayer Times Alexa Skill for Echo Show",
+  "description": "My Prayer Time — Islamic Prayer Times Alexa Skill for Echo Show",
   "private": true,
   "scripts": {
-    "test": "node lambda/node_modules/.bin/jest 2>/dev/null || (cd lambda && node -e \"require('./countdownService'); console.log('countdownService OK')\")",
+    "test": "cd lambda && npm test",
     "install:lambda": "cd lambda && npm install",
     "build": "cd lambda && npm install --production && cd .. && sam build",
     "local:invoke": "sam local invoke TawkitFunction --event events/launch.json"
