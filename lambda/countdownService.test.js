@@ -104,7 +104,7 @@ describe('getNextPrayer', () => {
   it('returns Asr (Hanafi) when between Dhuhr and Asr', () => {
     jest.spyOn(Date.prototype, 'toLocaleTimeString').mockReturnValue('14:00:00');
     const result = getNextPrayer(APEX_TIMES, TZ);
-    expect(result.name).toBe('Asr');
+    expect(result.name).toBe('Asar');
     expect(result.time).toBe('16:15');  // Hanafi Asr time
     jest.restoreAllMocks();
   });

@@ -37,6 +37,9 @@
                 "maxHeight": 800
               }
             ]
+          },
+          {
+            "type": "AUDIO_PLAYER"
           }
         ]
       }

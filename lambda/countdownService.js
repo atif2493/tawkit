@@ -4,8 +4,8 @@
  * Time utilities ported from Tawkit v9.61 (m2body.js).
  */
 
-const PRAYER_NAMES = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Eaisha'];
-const PRAYER_NAMES_AR = { Fajr: 'الفجر', Dhuhr: 'الظهر', Asr: 'العصر', Maghrib: 'المغرب', Eaisha: 'العشاء' };
+const PRAYER_NAMES = ['Fajr', 'Dhuhr', 'Asar', 'Maghrib', 'Eaisha'];
+const PRAYER_NAMES_AR = { Fajr: 'الفجر', Dhuhr: 'الظهر', Asar: 'العصر', Maghrib: 'المغرب', Eaisha: 'العشاء' };
 
 function timeToMinutes(timeStr) {
   const hours = parseInt(timeStr.substring(0, 2));
@@ -63,7 +63,7 @@ function getNextPrayer(times, timezone, iqamaTimes) {
   const prayers = [
     { name: 'Fajr', key: 'fajr', time: times.fajr },
     { name: 'Dhuhr', key: 'dhuhr', time: times.dhuhr },
-    { name: 'Asr', key: 'asr', time: times.asr },
+    { name: 'Asar', key: 'asr', time: times.asr },
     { name: 'Maghrib', key: 'maghrib', time: times.maghrib },
     { name: 'Eaisha', key: 'isha', time: times.isha },
   ];
@@ -168,7 +168,7 @@ function getPrayerStatuses(times, timezone, iqamaTimes) {
   const result = {};
   let foundNext = false;
 
-  const displayNames = { fajr: 'Fajr', dhuhr: 'Dhuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Eaisha' };
+  const displayNames = { fajr: 'Fajr', dhuhr: 'Dhuhr', asr: 'Asar', maghrib: 'Maghrib', isha: 'Eaisha' };
   for (const key of prayers) {
     const pMinutes = timeToMinutes(times[key]);
     const name = displayNames[key];

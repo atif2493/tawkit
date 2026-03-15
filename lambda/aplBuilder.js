@@ -7,6 +7,8 @@
 const path = require('path');
 const fs = require('fs');
 const { getNextPrayer, formatTo12Hr, formatCountdown, formatCountdownSpeech, getCountdownUrgency, getPrayerStatuses } = require('./countdownService');
+const { getRamadanContext } = require('./ramadanService');
+const { getDhulHijjahContext } = require('./hajjService');
 
 const COLORS = {
   background: '#0D1B2A', gold: '#D4AF37', white: '#FFFFFF', dimmed: '#4A4A4A',
@@ -88,23 +90,11 @@ function buildDatasource(prayerTimes, timezone) {
   const dayOfWeek = parseInt(now.toLocaleString('en-US', { weekday: 'narrow', timeZone: timezone }), 10);
   const isFriday = now.toLocaleString('en-US', { weekday: 'long', timeZone: timezone }) === 'Friday';
 
-  const hijriDay = parseInt(prayerTimes.hijri?.day || '0');
-  const hijriMonth = (prayerTimes.hijri?.month || '').toLowerCase();
-  const isRamadan = hijriMonth === 'ramadan' || hijriMonth === 'ramaḍān';
+  // Get full Ramadan context from ramadanService
+  const ramadan = getRamadanContext(prayerTimes, timezone);
 
-  let ramadanText = '';
-  let eidCountdown = '';
-  let eidEstDate = '';
-  if (isRamadan && hijriDay > 0) {
-    ramadanText = `Fast Day ${hijriDay} of 30`;
-    const daysToEid = 30 - hijriDay + 1;
-    const eidDate = new Date();
-    eidDate.setDate(eidDate.getDate() + daysToEid);
-    const eidMonth = eidDate.toLocaleString('en-US', { month: 'short', timeZone: timezone });
-    const eidDay = eidDate.toLocaleString('en-US', { day: 'numeric', timeZone: timezone });
-    eidCountdown = `Eid al-Fitr in ~${daysToEid} day${daysToEid !== 1 ? 's' : ''}`;
-    eidEstDate = `~${eidMonth} ${eidDay}`;
-  }
+  // Get Dhul Hijjah / Hajj context
+  const dhulHijjah = getDhulHijjahContext(prayerTimes, timezone);
 
   return {
     type: 'object',
@@ -117,16 +107,25 @@ function buildDatasource(prayerTimes, timezone) {
       gregorianDate: prayerTimes.gregorian?.formatted || '',
       currentTime: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: timezone }),
       moonPhase: getMoonPhaseEmoji(prayerTimes.hijri?.day),
-      isRamadan: isRamadan,
-      ramadanDay: isRamadan ? hijriDay : 0,
-      ramadanText: ramadanText,
-      showEidCountdown: isRamadan && hijriDay > 0,
-      eidCountdown: eidCountdown,
-      eidEstDate: eidEstDate,
+      isRamadan: ramadan.isRamadan,
+      ramadanDay: ramadan.hijriDay,
+      ramadanText: ramadan.ramadanText,
+      showEidCountdown: ramadan.showEidCountdown,
+      eidCountdown: ramadan.eidCountdown,
+      eidEstDate: ramadan.eidEstDate,
+      // Dhul Hijjah / Hajj fields
+      isDhulHijjah: dhulHijjah.isDhulHijjah,
+      dhulHijjah: dhulHijjah,
+      // Ramadan companion fields
+      suhoor: ramadan.suhoor,
+      iftar: ramadan.iftar,
+      lastTenNights: ramadan.lastTenNights,
+      zakat: ramadan.zakat,
+      spiritualReminder: ramadan.spiritualReminder,
       prayers: [
         { key: 'fajr', nameAr: 'الفجر', nameEn: 'Fajr', time: formatTo12Hr(prayerTimes.fajr), iqama: formatTo12Hr(iqama.fajr), time24: prayerTimes.fajr, status: statuses.fajr, isNext: statuses.fajr === 'next' || statuses.fajr === 'active', isActive: statuses.fajr === 'active' },
         { key: 'dhuhr', nameAr: 'الظهر', nameEn: 'Dhuhr', time: formatTo12Hr(prayerTimes.dhuhr), iqama: formatTo12Hr(iqama.dhuhr), time24: prayerTimes.dhuhr, status: statuses.dhuhr, isNext: statuses.dhuhr === 'next' || statuses.dhuhr === 'active', isActive: statuses.dhuhr === 'active' },
-        { key: 'asr', nameAr: 'العصر', nameEn: 'Asr', time: formatTo12Hr(prayerTimes.asr), iqama: formatTo12Hr(iqama.asr), time24: prayerTimes.asr, status: statuses.asr, isNext: statuses.asr === 'next' || statuses.asr === 'active', isActive: statuses.asr === 'active', note: '(حنفي)' },
+        { key: 'asr', nameAr: 'العصر', nameEn: 'Asar', time: formatTo12Hr(prayerTimes.asr), iqama: formatTo12Hr(iqama.asr), time24: prayerTimes.asr, status: statuses.asr, isNext: statuses.asr === 'next' || statuses.asr === 'active', isActive: statuses.asr === 'active', note: '(حنفي)' },
         { key: 'maghrib', nameAr: 'المغرب', nameEn: 'Maghrib', time: formatTo12Hr(prayerTimes.maghrib), iqama: formatTo12Hr(iqama.maghrib), time24: prayerTimes.maghrib, status: statuses.maghrib, isNext: statuses.maghrib === 'next' || statuses.maghrib === 'active', isActive: statuses.maghrib === 'active' },
         { key: 'isha', nameAr: 'العشاء', nameEn: 'Eaisha', time: formatTo12Hr(prayerTimes.isha), iqama: formatTo12Hr(iqama.isha), time24: prayerTimes.isha, status: statuses.isha, isNext: statuses.isha === 'next' || statuses.isha === 'active', isActive: statuses.isha === 'active' },
       ],
@@ -197,20 +196,48 @@ function buildSpeechText(prayerTimes, timezone) {
   const next = getNextPrayer(prayerTimes, timezone, iqama);
   const statuses = getPrayerStatuses(prayerTimes, timezone, iqama);
   const countdown = formatCountdownSpeech(next.secondsUntil);
+  const ramadan = getRamadanContext(prayerTimes, timezone);
 
   // If a prayer is currently active (between adhan and iqama), announce it
   if (next.isActive) {
-    return `${next.name} prayer time has started. Iqama at your masjid is at ${next.iqamaTime12hr}.`;
+    let speech = `${next.name} prayer time has started. Iqama at your masjid is at ${next.iqamaTime12hr}.`;
+    // During Ramadan at Maghrib — break your fast!
+    if (ramadan.isRamadan && next.name === 'Maghrib') {
+      speech += ' Break your fast! Bismillah.';
+    }
+    return speech;
   }
 
-  const prayerKeys = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
-  const prayerNames = { fajr: 'Fajr', dhuhr: 'Dhuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Eaisha' };
-  const upcoming = prayerKeys
-    .filter(k => statuses[k] === 'next' || statuses[k] === 'upcoming' || statuses[k] === 'active')
-    .map(k => `${prayerNames[k]} at ${formatTo12Hr(prayerTimes[k])}`)
-    .join(', ');
+  // Ramadan-specific speech additions
+  let ramadanSpeech = '';
+  if (ramadan.isRamadan) {
+    if (ramadan.suhoor.showBanner) {
+      ramadanSpeech = ` Suhoor ends in ${formatCountdownSpeech(ramadan.suhoor.minutesLeft * 60)} at ${ramadan.suhoor.endTime12hr}. Remember your fasting intention.`;
+    } else if (ramadan.iftar.showBanner) {
+      ramadanSpeech = ` Iftar in ${formatCountdownSpeech(ramadan.iftar.minutesLeft * 60)} at ${ramadan.iftar.time12hr}.`;
+    }
+    if (ramadan.lastTenNights.isActive) {
+      ramadanSpeech += ' Tonight is one of the last ten nights of Ramadan. Seek Laylat al-Qadr.';
+    }
+    if (ramadan.zakat.show) {
+      ramadanSpeech += " Don't forget Zakat al-Fitr before Eid.";
+    }
+  }
 
-  return `Prayer times for ${prayerTimes.city}. ${upcoming}. Next prayer is ${next.name} in ${countdown}.`;
+  // Dhul Hijjah speech
+  const dhulHijjah2 = getDhulHijjahContext(prayerTimes, timezone);
+  let hajjSpeech = '';
+  if (dhulHijjah2.isDhulHijjah) {
+    if (dhulHijjah2.isEidAlAdha) {
+      hajjSpeech = ' Eid al-Adha Mubarak!';
+    } else if (dhulHijjah2.isArafah) {
+      hajjSpeech = ' Today is the Day of Arafah. Fasting is highly recommended.';
+    } else if (dhulHijjah2.isFirstTenDays) {
+      hajjSpeech = ` ${dhulHijjah2.firstTenText}. Increase your good deeds.`;
+    }
+  }
+
+  return `Next prayer is ${next.name} at ${next.time12hr}, in ${countdown}.${ramadanSpeech}${hajjSpeech}`;
 }
 
 module.exports = { buildDatasource, buildAplDirective, buildWidgetDirective, buildSpeechText, loadAplDocument, loadWidgetDocument, COLORS };

@@ -179,7 +179,7 @@ async function setPrayerReminders(handlerInput, prayerTimes, timezone) {
   const prayers = [
     { name: 'Fajr', time: prayerTimes.fajr },
     { name: 'Dhuhr', time: prayerTimes.dhuhr },
-    { name: 'Asr', time: prayerTimes.asr },
+    { name: 'Asar', time: prayerTimes.asr },
     { name: 'Maghrib', time: prayerTimes.maghrib },
     { name: 'Eaisha', time: prayerTimes.isha },
   ];
@@ -220,4 +220,68 @@ async function setPrayerReminders(handlerInput, prayerTimes, timezone) {
   return { success: true, count: remindersSet, travelMinutes };
 }
 
-module.exports = { setPrayerReminders, getTravelTime, buildReminderText, REMINDER_OFFSETS };
+/**
+ * Set Ramadan-specific reminders (suhoor, iftar, zakat).
+ * @param {object} handlerInput - Alexa handler input
+ * @param {object} prayerTimes - { fajr, sunrise, maghrib } in "HH:MM" 24hr
+ * @param {string} timezone
+ * @param {object} ramadanContext - from getRamadanContext()
+ */
+async function setRamadanReminders(handlerInput, prayerTimes, timezone, ramadanContext) {
+  if (!ramadanContext.isRamadan) return { success: true, count: 0 };
+
+  let reminderApiClient;
+  try {
+    reminderApiClient = handlerInput.serviceClientFactory.getReminderManagementServiceClient();
+  } catch (err) {
+    console.warn('[reminderService] Reminders not available for Ramadan:', err.message);
+    return { success: false, reason: 'no_permission' };
+  }
+
+  const now = new Date();
+  const nowStr = now.toLocaleString('en-US', { timeZone: timezone });
+  const localNow = new Date(nowStr);
+  const diffMs = now.getTime() - localNow.getTime();
+  let remindersSet = 0;
+
+  function buildReminderDate(timeStr, offsetMinutes) {
+    const [hh, mm] = timeStr.split(':').map(Number);
+    const d = new Date(localNow);
+    d.setHours(hh, mm, 0, 0);
+    const reminderLocal = new Date(d.getTime() - offsetMinutes * 60000);
+    if (reminderLocal <= localNow) return null;
+    return new Date(reminderLocal.getTime() + diffMs);
+  }
+
+  async function setReminder(text, timeStr, offsetMinutes) {
+    const utcDate = buildReminderDate(timeStr, offsetMinutes);
+    if (!utcDate) return;
+    try {
+      await createReminder(reminderApiClient, text, utcDate);
+      remindersSet++;
+    } catch (err) {
+      console.error(`[reminderService] Ramadan reminder failed:`, err.message);
+    }
+  }
+
+  // Suhoor reminders (before Fajr)
+  await setReminder('Suhoor time — 1 hour before Fajr. Start your meal.', prayerTimes.fajr, 60);
+  await setReminder('30 minutes left for Suhoor. Finish eating soon.', prayerTimes.fajr, 30);
+  await setReminder('Suhoor ending soon! 10 minutes until Fajr. Stop eating!', prayerTimes.fajr, 10);
+  await setReminder('Fajr has entered. Stop eating. May Allah accept your fast.', prayerTimes.fajr, 0);
+
+  // Iftar reminders (before Maghrib)
+  await setReminder('Iftar in 15 minutes. Prepare to break your fast.', prayerTimes.maghrib, 15);
+  await setReminder('Almost time! Iftar in 5 minutes.', prayerTimes.maghrib, 5);
+  await setReminder('Maghrib has entered. Break your fast! Bismillah.', prayerTimes.maghrib, 0);
+
+  // Zakat reminder (day 25-30, at Dhuhr)
+  if (ramadanContext.zakat.show) {
+    await setReminder('Remember to pay Zakat al-Fitr before Eid prayer.', prayerTimes.dhuhr || '12:30', 0);
+  }
+
+  console.log(`[reminderService] Set ${remindersSet} Ramadan reminders`);
+  return { success: true, count: remindersSet };
+}
+
+module.exports = { setPrayerReminders, setRamadanReminders, getTravelTime, buildReminderText, REMINDER_OFFSETS };

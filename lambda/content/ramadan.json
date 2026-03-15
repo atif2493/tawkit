@@ -1,0 +1,56 @@
+{
+  "_source": "Hisn al-Muslim (Fortress of the Muslim), Sahih al-Bukhari, Sunan al-Tirmidhi",
+  "suhoorDua": {
+    "arabic": "وَبِصَوْمِ غَدٍ نَّوَيْتُ مِنْ شَهْرِ رَمَضَانَ",
+    "transliteration": "Wa bisawmi ghadin nawaytu min shahri Ramadan",
+    "english": "I intend to keep the fast for tomorrow in the month of Ramadan"
+  },
+  "iftarDua": {
+    "arabic": "اللَّهُمَّ إِنِّي لَكَ صُمْتُ وَبِكَ آمَنْتُ وَعَلَىٰ رِزْقِكَ أَفْطَرْتُ ، ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الْأَجْرُ إِنْ شَاءَ اللَّهُ",
+    "transliteration": "Allahumma inni laka sumtu, wa bika aamantu, wa 'ala rizqika aftartu. Dhahaba al-dhama'u, wab-tallat al-'urooqu, wa thabata al-ajru in sha Allah",
+    "english": "O Allah, I fasted for You, believed in You, and broke my fast with Your provision. The thirst has gone, the veins are moistened, and the reward is confirmed, if Allah wills."
+  },
+  "lastTenNights": {
+    "messageAr": "العشر الأواخر من رمضان — أحيوا لياليها",
+    "messageEn": "The Last 10 Nights of Ramadan — Seek Laylat al-Qadr",
+    "laylatalQadr": {
+      "arabic": "لَيْلَةُ الْقَدْرِ خَيْرٌ مِّنْ أَلْفِ شَهْرٍ",
+      "ref": "سورة القدر: ٣",
+      "english": "The Night of Decree is better than a thousand months"
+    },
+    "dua": {
+      "arabic": "اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي",
+      "transliteration": "Allahumma innaka 'afuwwun tuhibbul 'afwa fa'fu 'anni",
+      "english": "O Allah, You are the Pardoner, You love to pardon, so pardon me",
+      "source": "Tirmidhi — Aisha (RA)"
+    },
+    "oddNights": [21, 23, 25, 27, 29]
+  },
+  "zakatReminder": {
+    "messageAr": "لا تنسَ إخراج زكاة الفطر قبل صلاة العيد",
+    "messageEn": "Remember to pay Zakat al-Fitr before Eid prayer",
+    "startDay": 25
+  },
+  "spiritualReminders": [
+    {
+      "arabic": "شَهْرُ رَمَضَانَ الَّذِي أُنزِلَ فِيهِ الْقُرْآنُ هُدًى لِّلنَّاسِ وَبَيِّنَاتٍ مِّنَ الْهُدَىٰ وَالْفُرْقَانِ",
+      "ref": "البقرة: ١٨٥",
+      "english": "The month of Ramadan in which the Quran was revealed, a guidance for mankind"
+    },
+    {
+      "arabic": "مَنْ صَامَ رَمَضَانَ إِيمَانًا وَاحْتِسَابًا غُفِرَ لَهُ مَا تَقَدَّمَ مِنْ ذَنْبِهِ",
+      "ref": "البخاري",
+      "english": "Whoever fasts Ramadan out of faith and seeking reward, his past sins will be forgiven"
+    },
+    {
+      "arabic": "إِذَا جَاءَ رَمَضَانُ فُتِحَتْ أَبْوَابُ الْجَنَّةِ وَغُلِّقَتْ أَبْوَابُ النَّارِ وَصُفِّدَتِ الشَّيَاطِينُ",
+      "ref": "البخاري",
+      "english": "When Ramadan comes, the gates of Paradise are opened, the gates of Hell are closed, and the devils are chained"
+    },
+    {
+      "arabic": "مَنْ قَامَ لَيْلَةَ الْقَدْرِ إِيمَانًا وَاحْتِسَابًا غُفِرَ لَهُ مَا تَقَدَّمَ مِنْ ذَنْبِهِ",
+      "ref": "البخاري",
+      "english": "Whoever stands in prayer on Laylat al-Qadr out of faith and seeking reward, his past sins will be forgiven"
+    }
+  ]
+}

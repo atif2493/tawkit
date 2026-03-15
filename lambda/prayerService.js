@@ -1,7 +1,7 @@
 /**
  * prayerService.js
  * Fetches prayer times from AlAdhan.com API using city-based lookup.
- * Uses Hanafi madhab (school=1) for Asr calculation.
+ * Uses Shafi'i madhab (school=0) for Asr calculation.
  *
  * API Docs: https://aladhan.com/prayer-times-api
  */
@@ -15,7 +15,7 @@ const CONFIG = {
   state:    process.env.PRAYER_STATE    || 'NC',
   country:  process.env.PRAYER_COUNTRY  || 'US',
   method:   process.env.PRAYER_METHOD   || '2',    // 2 = ISNA (North America)
-  school:   process.env.PRAYER_SCHOOL   || '1',    // 1 = Hanafi (affects Asr only)
+  school:   process.env.PRAYER_SCHOOL   || '0',    // 0 = Shafi'i (affects Asr only)
   timezone: process.env.PRAYER_TIMEZONE || 'America/New_York',
 };
 

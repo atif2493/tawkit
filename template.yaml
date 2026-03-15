@@ -51,8 +51,8 @@ Parameters:
     Description: "AlAdhan calculation method — 2=ISNA (North America)"
   PrayerSchool:
     Type:    String
-    Default: "1"
-    Description: "Juristic school — 1=Hanafi (later Asr), 0=Shafi"
+    Default: "0"
+    Description: "Juristic school — 0=Shafi'i (earlier Asr), 1=Hanafi (later Asr)"
   PrayerTimezone:
     Type:    String
     Default: America/New_York
