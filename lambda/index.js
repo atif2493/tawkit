@@ -4,11 +4,12 @@
  * EventBridge (prayer time + midnight reset), Help/Stop/Cancel, SessionEnded, Error.
  */
 
-const Alexa = require('ask-sdk-core');
+const Alexa = require('ask-sdk');
 const { getPrayerTimes } = require('./prayerService');
 const { getCurrentContent } = require('./contentService');
-const { buildDatasource, buildAplDirective, buildSpeechText, loadAplDocument } = require('./aplBuilder');
+const { buildDatasource, buildAplDirective, buildWidgetDirective, buildSpeechText, loadAplDocument } = require('./aplBuilder');
 const { CONFIG } = require('./prayerService');
+const { setPrayerReminders } = require('./reminderService');
 
 function supportsAPL(handlerInput) {
   const interfaces = Alexa.getSupportedInterfaces(handlerInput.requestEnvelope);
@@ -23,10 +24,26 @@ async function buildPrayerTimesResponse(handlerInput) {
   const speechText = buildSpeechText(prayerTimes, timezone);
   const aplDocument = loadAplDocument();
 
+  // Set prayer reminders (non-blocking — don't fail the response if reminders fail)
+  try {
+    const reminderResult = await setPrayerReminders(handlerInput, prayerTimes, timezone);
+    if (reminderResult.success) {
+      console.log(`[index] Set ${reminderResult.count} reminders (travel: ${reminderResult.travelMinutes}min)`);
+    } else {
+      console.log(`[index] Reminders skipped: ${reminderResult.reason}`);
+    }
+  } catch (err) {
+    console.warn('[index] Reminder setup failed (non-fatal):', err.message);
+  }
+
   const response = handlerInput.responseBuilder.speak(speechText);
   if (supportsAPL(handlerInput)) {
     response.addDirective(buildAplDirective(datasource, content, aplDocument));
   }
+  // Set a simple card for home screen / Alexa app
+  response.withSimpleCard('My Prayer Time', `Next: ${datasource.properties.nextPrayer.nameEn} at ${datasource.properties.nextPrayer.time} (${datasource.properties.nextPrayer.countdown})\n\nFajr: ${datasource.properties.prayers[0].time}\nDhuhr: ${datasource.properties.prayers[1].time}\nAsr: ${datasource.properties.prayers[2].time}\nMaghrib: ${datasource.properties.prayers[3].time}\nEaisha: ${datasource.properties.prayers[4].time}`);
+  // Keep session open so display persists
+  response.withShouldEndSession(false);
   return response.getResponse();
 }
 
@@ -122,7 +139,7 @@ exports.handler = async (event, context) => {
     console.warn('[index] WARNING: SKILL_ID env var is not set — request signature validation disabled');
   }
 
-  const skill = Alexa.SkillBuilders.custom()
+  const skill = Alexa.SkillBuilders.standard()
     .addRequestHandlers(
       LaunchRequestHandler,
       PrayerTimesIntentHandler,

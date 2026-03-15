@@ -25,15 +25,34 @@
           "sourceDir": "lambda"
         },
         "interfaces": [
-          { "type": "ALEXA_PRESENTATION_APL" }
+          {
+            "type": "ALEXA_PRESENTATION_APL",
+            "supportedViewports": [
+              {
+                "mode": "HUB",
+                "shape": "RECTANGLE",
+                "minWidth": 100,
+                "maxWidth": 1280,
+                "minHeight": 100,
+                "maxHeight": 800
+              }
+            ]
+          }
         ]
       }
     },
     "manifestVersion": "1.0",
-    "permissions": [],
+    "permissions": [
+      {
+        "name": "alexa::alerts:reminders:skill:readwrite"
+      },
+      {
+        "name": "alexa::devices:all:address:full:read"
+      }
+    ],
     "privacyAndCompliance": {
       "allowsPurchases": false,
-      "usesPersonalInfo": false,
+      "usesPersonalInfo": true,
       "isChildDirected": false,
       "isExportCompliant": true,
       "containsAds": false,

@@ -7,7 +7,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "ask-sdk-core": "^2.14.0"
+    "ask-sdk": "^2.14.0"
   },
   "devDependencies": {
     "jest": "^29.7.0"

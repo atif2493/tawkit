@@ -18,6 +18,17 @@ Globals:
         PRAYER_TIMEZONE: !Ref PrayerTimezone
         SKILL_ID:        !Ref AlexaSkillId
         S3_BUCKET:       !Ref ContentBucket
+        IQAMA_FAJR:      !Ref IqamaFajr
+        IQAMA_DHUHR:     !Ref IqamaDhuhr
+        IQAMA_ASR:       !Ref IqamaAsr
+        IQAMA_MAGHRIB:   !Ref IqamaMaghrib
+        IQAMA_ISHA:      !Ref IqamaIsha
+        JUMUAH_1:        !Ref Jumuah1
+        JUMUAH_2:        !Ref Jumuah2
+        HOME_ADDRESS:         !Ref HomeAddress
+        MOSQUE_ADDRESS:       !Ref MosqueAddress
+        GOOGLE_MAPS_API_KEY:  !Ref GoogleMapsApiKey
+        TRAVEL_TIME_FALLBACK: !Ref TravelTimeFallback
 
 # ─── PARAMETERS ───────────────────────────────────────────────────────────────
 Parameters:
@@ -45,6 +56,50 @@ Parameters:
   PrayerTimezone:
     Type:    String
     Default: America/New_York
+  IqamaFajr:
+    Type:    String
+    Default: "06:30"
+    Description: "Iqama time for Fajr (24hr format)"
+  IqamaDhuhr:
+    Type:    String
+    Default: "13:30"
+    Description: "Iqama time for Dhuhr (24hr format)"
+  IqamaAsr:
+    Type:    String
+    Default: "17:30"
+    Description: "Iqama time for Asr (24hr format)"
+  IqamaMaghrib:
+    Type:    String
+    Default: "19:25"
+    Description: "Iqama time for Maghrib (24hr format)"
+  IqamaIsha:
+    Type:    String
+    Default: "21:15"
+    Description: "Iqama time for Eaisha (24hr format)"
+  Jumuah1:
+    Type:    String
+    Default: "12:15"
+    Description: "Jumuah khutbah 1 time (24hr format)"
+  Jumuah2:
+    Type:    String
+    Default: "13:30"
+    Description: "Jumuah khutbah 2 time (24hr format)"
+  HomeAddress:
+    Type:    String
+    Default: "Apex, NC"
+    Description: "User home address for travel time calculation"
+  MosqueAddress:
+    Type:    String
+    Default: "Apex Mosque, 733 Center St, Apex, NC 27502"
+    Description: "Mosque address for travel time calculation"
+  GoogleMapsApiKey:
+    Type:    String
+    Default: ""
+    Description: "Google Maps Directions API key for traffic-based travel time"
+  TravelTimeFallback:
+    Type:    String
+    Default: "12"
+    Description: "Fallback travel time in minutes if Maps API unavailable"
 
 # ─── RESOURCES ────────────────────────────────────────────────────────────────
 Resources:

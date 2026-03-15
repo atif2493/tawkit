@@ -1,0 +1,138 @@
+{
+  "type": "APL",
+  "version": "2024.1",
+  "theme": "light",
+  "import": [
+    { "name": "alexa-layouts", "version": "1.7.0" }
+  ],
+  "mainTemplate": {
+    "parameters": ["widgetData"],
+    "item": {
+      "type": "Frame",
+      "width": "100%",
+      "height": "100%",
+      "backgroundColor": "#FAF9F6",
+      "borderRadius": "16dp",
+      "item": {
+        "type": "Container",
+        "width": "100%",
+        "height": "100%",
+        "direction": "column",
+        "paddingLeft": "16dp",
+        "paddingRight": "16dp",
+        "paddingTop": "12dp",
+        "paddingBottom": "12dp",
+        "items": [
+          {
+            "type": "Container",
+            "direction": "row",
+            "justifyContent": "spaceBetween",
+            "alignItems": "center",
+            "width": "100%",
+            "items": [
+              {
+                "type": "Text",
+                "text": "🕌 My Prayer Time",
+                "fontSize": "18dp",
+                "fontWeight": "700",
+                "color": "#2C3E50"
+              },
+              {
+                "type": "Text",
+                "text": "${widgetData.properties.currentTime}",
+                "fontSize": "16dp",
+                "fontWeight": "600",
+                "color": "#6B7280"
+              }
+            ]
+          },
+          {
+            "type": "Frame",
+            "width": "100%",
+            "height": "2dp",
+            "backgroundColor": "#E5E7EB",
+            "spacing": "8dp"
+          },
+          {
+            "type": "Container",
+            "direction": "row",
+            "justifyContent": "spaceBetween",
+            "alignItems": "center",
+            "width": "100%",
+            "spacing": "8dp",
+            "grow": 1,
+            "items": [
+              {
+                "type": "Container",
+                "direction": "column",
+                "grow": 1,
+                "items": [
+                  {
+                    "type": "Container",
+                    "direction": "row",
+                    "justifyContent": "spaceBetween",
+                    "width": "100%",
+                    "data": "${widgetData.properties.prayers}",
+                    "item": {
+                      "type": "Container",
+                      "direction": "column",
+                      "alignItems": "center",
+                      "width": "18%",
+                      "items": [
+                        {
+                          "type": "Text",
+                          "text": "${data.nameEn}",
+                          "fontSize": "14dp",
+                          "fontWeight": "${data.isNext ? '700' : '400'}",
+                          "color": "${data.isNext ? '#0D9488' : '#374151'}"
+                        },
+                        {
+                          "type": "Text",
+                          "text": "${data.time}",
+                          "fontSize": "13dp",
+                          "fontWeight": "${data.isNext ? '700' : '400'}",
+                          "color": "${data.isNext ? '#0D9488' : '#6B7280'}",
+                          "spacing": "2dp"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Frame",
+            "width": "100%",
+            "height": "2dp",
+            "backgroundColor": "#E5E7EB",
+            "spacing": "6dp"
+          },
+          {
+            "type": "Container",
+            "direction": "row",
+            "justifyContent": "spaceBetween",
+            "alignItems": "center",
+            "width": "100%",
+            "spacing": "6dp",
+            "items": [
+              {
+                "type": "Text",
+                "text": "⏳ ${widgetData.properties.nextPrayer.nameEn} in ${widgetData.properties.nextPrayer.countdown}",
+                "fontSize": "16dp",
+                "fontWeight": "700",
+                "color": "#0D9488"
+              },
+              {
+                "type": "Text",
+                "text": "${widgetData.properties.hijriDateEn}",
+                "fontSize": "13dp",
+                "color": "#9CA3AF"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
