@@ -65,7 +65,6 @@
                 "justifyContent": "spaceBetween",
                 "alignItems": "center",
                 "width": "100%",
-                "height": "7vh",
                 "items": [
                   {
                     "type": "Container",
@@ -92,6 +91,7 @@
                     "type": "Container",
                     "direction": "column",
                     "alignItems": "end",
+                    "shrink": 1,
                     "items": [
                       {
                         "type": "Container",
@@ -101,12 +101,12 @@
                           {
                             "type": "Text",
                             "text": "${myPrayerTimeData.properties.moonPhase}",
-                            "fontSize": "32.5dp"
+                            "fontSize": "28dp"
                           },
                           {
                             "type": "Text",
                             "text": " ${myPrayerTimeData.properties.hijriDateEn}",
-                            "fontSize": "26.5dp",
+                            "fontSize": "22dp",
                             "fontWeight": "600",
                             "color": "#95773E"
                           }
@@ -115,7 +115,7 @@
                       {
                         "type": "Text",
                         "text": "${myPrayerTimeData.properties.cityName} · ${myPrayerTimeData.properties.madhab}",
-                        "fontSize": "19.5dp",
+                        "fontSize": "17dp",
                         "color": "#50575C"
                       }
                     ]
@@ -131,12 +131,63 @@
               },
 
               {
+                "type": "Frame",
+                "position": "absolute",
+                "right": "4vw",
+                "top": "14vh",
+                "width": "145dp",
+                "height": "145dp",
+                "borderRadius": "73dp",
+                "backgroundColor": "rgba(13,112,57,0.1)",
+                "borderWidth": "3",
+                "borderColor": "#0D7039",
+                "item": {
+                  "type": "Container",
+                  "alignItems": "center",
+                  "justifyContent": "center",
+                  "direction": "column",
+                  "width": "100%",
+                  "height": "100%",
+                  "items": [
+                    {
+                      "type": "Text",
+                      "text": "${myPrayerTimeData.properties.nextPrayer.countdown}",
+                      "fontSize": "30dp",
+                      "fontWeight": "700",
+                      "color": "#24332A"
+                    },
+                    {
+                      "type": "Text",
+                      "text": "━━━",
+                      "fontSize": "14dp",
+                      "color": "#D0D0D0"
+                    },
+                    {
+                      "type": "Text",
+                      "text": "${myPrayerTimeData.properties.nextPrayer.nameEn}",
+                      "fontSize": "22dp",
+                      "fontWeight": "700",
+                      "color": "#0D7039"
+                    },
+                    {
+                      "type": "Text",
+                      "text": "at ${myPrayerTimeData.properties.nextPrayer.time}",
+                      "fontSize": "14dp",
+                      "fontWeight": "600",
+                      "color": "#0D7039"
+                    }
+                  ]
+                }
+              },
+
+              {
                 "type": "Container",
                 "when": "${myPrayerTimeData.properties.isRamadan}",
                 "direction": "column",
-                "alignItems": "center",
-                "width": "100%",
-                "spacing": "12.5dp",
+                "alignItems": "start",
+                "width": "73vw",
+                "spacing": "14dp",
+                "paddingTop": "8dp",
                 "items": [
                   {
                     "type": "Frame",
@@ -156,14 +207,14 @@
                         {
                           "type": "Text",
                           "text": "🌙 ${myPrayerTimeData.properties.ramadanText}",
-                          "fontSize": "19.5dp",
+                          "fontSize": "21dp",
                           "fontWeight": "700",
                           "color": "#0D7039"
                         },
                         {
                           "type": "Text",
                           "text": "  ·  ${myPrayerTimeData.properties.eidCountdown} (${myPrayerTimeData.properties.eidEstDate})",
-                          "fontSize": "19.5dp",
+                          "fontSize": "21dp",
                           "color": "#50575C"
                         }
                       ]
@@ -189,14 +240,14 @@
                         {
                           "type": "Text",
                           "text": "🌙 Suhoor ends in ${myPrayerTimeData.properties.suhoor.countdown}",
-                          "fontSize": "19.5dp",
+                          "fontSize": "21dp",
                           "fontWeight": "700",
                           "color": "${myPrayerTimeData.properties.suhoor.urgency == 'urgent' ? '#DB655E' : '#24332A'}"
                         },
                         {
                           "type": "Text",
                           "text": "  ·  Fajr at ${myPrayerTimeData.properties.suhoor.endTime12hr}",
-                          "fontSize": "19.5dp",
+                          "fontSize": "21dp",
                           "color": "#50575C"
                         }
                       ]
@@ -218,27 +269,23 @@
                       "type": "Container",
                       "direction": "row",
                       "alignItems": "center",
+                      "wrap": "wrap",
                       "items": [
                         {
                           "type": "Text",
-                          "text": "🍽️ Iftar in ${myPrayerTimeData.properties.iftar.countdown}",
-                          "fontSize": "19.5dp",
+                          "text": "🍽️ Iftar in ${myPrayerTimeData.properties.iftar.countdown}  ·  Maghrib at ${myPrayerTimeData.properties.iftar.time12hr}",
+                          "fontSize": "21dp",
                           "fontWeight": "700",
                           "color": "${myPrayerTimeData.properties.iftar.urgency == 'urgent' ? '#DB655E' : '#24332A'}"
                         },
                         {
                           "type": "Text",
-                          "text": "  ·  Maghrib at ${myPrayerTimeData.properties.iftar.time12hr}",
-                          "fontSize": "19.5dp",
-                          "color": "#50575C"
-                        },
-                        {
-                          "type": "Text",
                           "when": "${myPrayerTimeData.properties.iftar.showDua && myPrayerTimeData.properties.iftar.dua}",
                           "text": "  ·  ${myPrayerTimeData.properties.iftar.dua.arabic}",
-                          "fontSize": "19.5dp",
+                          "fontSize": "19dp",
                           "fontWeight": "600",
-                          "color": "#95773E"
+                          "color": "#95773E",
+                          "maxLines": 2
                         }
                       ]
                     }
@@ -259,28 +306,22 @@
                       "type": "Container",
                       "direction": "row",
                       "alignItems": "center",
+                      "wrap": "wrap",
                       "items": [
                         {
                           "type": "Text",
-                          "text": "✨ Night ${myPrayerTimeData.properties.lastTenNights.nightNumber} of Last 10",
-                          "fontSize": "19.5dp",
+                          "text": "✨ Night ${myPrayerTimeData.properties.lastTenNights.nightNumber} of Last 10${myPrayerTimeData.properties.lastTenNights.isOddNight ? '  ·  Seek Laylat al-Qadr!' : ''}",
+                          "fontSize": "21dp",
                           "fontWeight": "700",
-                          "color": "#95773E"
-                        },
-                        {
-                          "type": "Text",
-                          "when": "${myPrayerTimeData.properties.lastTenNights.isOddNight}",
-                          "text": "  ·  Seek Laylat al-Qadr!",
-                          "fontSize": "19.5dp",
-                          "fontWeight": "600",
                           "color": "#95773E"
                         },
                         {
                           "type": "Text",
                           "when": "${myPrayerTimeData.properties.lastTenNights.dua}",
                           "text": "  ${myPrayerTimeData.properties.lastTenNights.dua.arabic}",
-                          "fontSize": "19.5dp",
-                          "color": "#50575C"
+                          "fontSize": "19dp",
+                          "color": "#50575C",
+                          "maxLines": 2
                         }
                       ]
                     }
@@ -290,7 +331,7 @@
                     "type": "Text",
                     "when": "${myPrayerTimeData.properties.zakat.show}",
                     "text": "💰 ${myPrayerTimeData.properties.zakat.messageEn}",
-                    "fontSize": "19.5dp",
+                    "fontSize": "21dp",
                     "fontWeight": "600",
                     "color": "#0D7039"
                   }
@@ -301,9 +342,10 @@
                 "type": "Container",
                 "when": "${myPrayerTimeData.properties.isDhulHijjah}",
                 "direction": "column",
-                "alignItems": "center",
-                "width": "100%",
-                "spacing": "12.5dp",
+                "alignItems": "start",
+                "width": "73vw",
+                "spacing": "6dp",
+                "paddingTop": "4dp",
                 "items": [
                   {
                     "type": "Frame",
@@ -324,21 +366,21 @@
                         {
                           "type": "Text",
                           "text": "🕋 ${myPrayerTimeData.properties.dhulHijjah.firstTenText}",
-                          "fontSize": "19.5dp",
+                          "fontSize": "21dp",
                           "fontWeight": "700",
                           "color": "#95773E"
                         },
                         {
                           "type": "Text",
                           "text": "  ·  Best 10 Days of the Year",
-                          "fontSize": "19.5dp",
+                          "fontSize": "21dp",
                           "color": "#50575C"
                         },
                         {
                           "type": "Text",
                           "when": "${myPrayerTimeData.properties.dhulHijjah.eidAdhaCountdown}",
                           "text": "  ·  ${myPrayerTimeData.properties.dhulHijjah.eidAdhaCountdown}",
-                          "fontSize": "19.5dp",
+                          "fontSize": "21dp",
                           "color": "#50575C"
                         }
                       ]
@@ -364,7 +406,7 @@
                         {
                           "type": "Text",
                           "text": "🕋 ${myPrayerTimeData.properties.dhulHijjah.hajjCountdown}",
-                          "fontSize": "19.5dp",
+                          "fontSize": "21dp",
                           "fontWeight": "700",
                           "color": "#0D7039"
                         }
@@ -391,14 +433,14 @@
                         {
                           "type": "Text",
                           "text": "🤲 Day of Arafah",
-                          "fontSize": "19.5dp",
+                          "fontSize": "21dp",
                           "fontWeight": "700",
                           "color": "#0D7039"
                         },
                         {
                           "type": "Text",
                           "text": "  ·  Fasting Highly Recommended",
-                          "fontSize": "19.5dp",
+                          "fontSize": "21dp",
                           "fontWeight": "600",
                           "color": "#95773E"
                         }
@@ -425,14 +467,14 @@
                         {
                           "type": "Text",
                           "text": "🎉 Eid al-Adha Mubarak!",
-                          "fontSize": "19.5dp",
+                          "fontSize": "21dp",
                           "fontWeight": "700",
                           "color": "#95773E"
                         },
                         {
                           "type": "Text",
                           "text": "  ·  تقبّل الله منّا ومنكم",
-                          "fontSize": "19.5dp",
+                          "fontSize": "21dp",
                           "fontWeight": "600",
                           "color": "#95773E"
                         }
@@ -459,14 +501,14 @@
                         {
                           "type": "Text",
                           "text": "📿 ${myPrayerTimeData.properties.dhulHijjah.bannerText}",
-                          "fontSize": "19.5dp",
+                          "fontSize": "21dp",
                           "fontWeight": "700",
                           "color": "#0D7039"
                         },
                         {
                           "type": "Text",
                           "text": "  ·  Takbeer after every prayer",
-                          "fontSize": "19.5dp",
+                          "fontSize": "21dp",
                           "color": "#50575C"
                         }
                       ]
@@ -477,97 +519,28 @@
 
               {
                 "type": "Container",
-                "direction": "row",
-                "justifyContent": "spaceBetween",
+                "direction": "column",
                 "alignItems": "center",
+                "justifyContent": "center",
                 "width": "100%",
                 "grow": 1,
                 "items": [
-
                   {
-                    "type": "Container",
-                    "direction": "column",
-                    "alignItems": "center",
-                    "justifyContent": "center",
-                    "grow": 1,
-                    "items": [
-                      {
-                        "type": "Text",
-                        "text": "${myPrayerTimeData.properties.currentTime}",
-                        "fontSize": "104.5dp",
-                        "fontWeight": "200",
-                        "color": "#24332A",
-                        "textAlign": "center",
-                        "letterSpacing": "2dp"
-                      },
-                      {
-                        "type": "Text",
-                        "text": "${myPrayerTimeData.properties.gregorianDate}",
-                        "fontSize": "26.5dp",
-                        "color": "#50575C",
-                        "textAlign": "center",
-                        "spacing": "4dp"
-                      }
-                    ]
+                    "type": "Text",
+                    "text": "${myPrayerTimeData.properties.currentTime}",
+                    "fontSize": "104.5dp",
+                    "fontWeight": "200",
+                    "color": "#24332A",
+                    "textAlign": "center",
+                    "letterSpacing": "2dp"
                   },
-
                   {
-                    "type": "Container",
-                    "direction": "column",
-                    "alignItems": "center",
-                    "justifyContent": "center",
-                    "width": "24vw",
-                    "paddingBottom": "5dp",
-                    "items": [
-                      {
-                        "type": "Frame",
-                        "width": "170dp",
-                        "height": "170dp",
-                        "borderRadius": "85dp",
-                        "backgroundColor": "rgba(13,112,57,0.1)",
-                        "borderWidth": "3",
-                        "borderColor": "#0D7039",
-                        "item": {
-                          "type": "Container",
-                          "alignItems": "center",
-                          "justifyContent": "center",
-                          "direction": "column",
-                          "width": "100%",
-                          "height": "100%",
-                          "items": [
-                            {
-                              "type": "Text",
-                              "text": "${myPrayerTimeData.properties.nextPrayer.countdown}",
-                              "fontSize": "38.5dp",
-                              "fontWeight": "700",
-                              "color": "#24332A"
-                            },
-                            {
-                              "type": "Text",
-                              "text": "━━━",
-                              "fontSize": "20.5dp",
-                              "color": "#D0D0D0"
-                            },
-                            {
-                              "type": "Text",
-                              "text": "${myPrayerTimeData.properties.nextPrayer.nameEn}",
-                              "fontSize": "28.5dp",
-                              "fontWeight": "700",
-                              "color": "#0D7039"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "type": "Text",
-                        "text": "at ${myPrayerTimeData.properties.nextPrayer.time}",
-                        "fontSize": "20.5dp",
-                        "fontWeight": "600",
-                        "color": "#0D7039",
-                        "textAlign": "center",
-                        "spacing": "8dp"
-                      }
-                    ]
+                    "type": "Text",
+                    "text": "${myPrayerTimeData.properties.gregorianDate}",
+                    "fontSize": "26.5dp",
+                    "color": "#50575C",
+                    "textAlign": "center",
+                    "spacing": "4dp"
                   }
                 ]
               },
@@ -578,7 +551,7 @@
                 "justifyContent": "spaceEvenly",
                 "alignItems": "stretch",
                 "width": "100%",
-                "height": "36vh",
+                "height": "34vh",
                 "items": [
 
                   {

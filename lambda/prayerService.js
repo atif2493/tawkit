@@ -43,11 +43,12 @@ function getTodayDateStr() {
   return `${dd}-${mm}-${yyyy}`;
 }
 
-function buildApiUrl(dateStr) {
+function buildApiUrl(dateStr, locationOverride) {
+  const loc = locationOverride || {};
   const params = new URLSearchParams({
-    city:    CONFIG.city,
-    country: CONFIG.country,
-    state:   CONFIG.state,
+    city:    loc.city    || CONFIG.city,
+    country: loc.country || CONFIG.country,
+    state:   loc.state   || CONFIG.state,
     method:  CONFIG.method,
     school:  CONFIG.school,
   });
@@ -89,23 +90,32 @@ function parseApiResponse(data) {
       year:      d.gregorian.year,
       formatted: `${d.gregorian.weekday.en}, ${d.gregorian.day} ${d.gregorian.month.en} ${d.gregorian.year}`,
     },
-    city:     CONFIG.city,
-    timezone: CONFIG.timezone,
+    city:     null, // set by caller
+    timezone: null, // set by caller
     madhab:   'Hanafi',
     method:   'ISNA',
     fetchedAt: new Date().toISOString(),
   };
 }
 
-async function getPrayerTimes(forceRefresh = false) {
+/**
+ * Get prayer times, optionally using a device location override.
+ * @param {boolean} forceRefresh - Force API call even if cached
+ * @param {object} [locationOverride] - { city, state, country, timezone } from device address
+ */
+async function getPrayerTimes(forceRefresh = false, locationOverride) {
   const today = getTodayDateStr();
+  const loc = locationOverride || {};
+  const city = loc.city || CONFIG.city;
+  const timezone = loc.timezone || CONFIG.timezone;
+  const cacheKey = `${today}:${city}:${loc.state || CONFIG.state}:${loc.country || CONFIG.country}`;
 
-  if (!forceRefresh && _cache && _cache._date === today) {
-    console.log('[prayerService] Returning cached prayer times for', today);
+  if (!forceRefresh && _cache && _cache._cacheKey === cacheKey) {
+    console.log('[prayerService] Returning cached prayer times for', cacheKey);
     return _cache;
   }
 
-  const url = buildApiUrl(today);
+  const url = buildApiUrl(today, loc);
   console.log('[prayerService] Fetching prayer times:', url);
 
   try {
@@ -115,8 +125,11 @@ async function getPrayerTimes(forceRefresh = false) {
     }
     const times  = parseApiResponse(json);
     times._date  = today;
+    times._cacheKey = cacheKey;
+    times.city = city;
+    times.timezone = timezone;
     _cache = times;
-    console.log('[prayerService] Fetched OK — Asr (Hanafi):', times.asr, '| City:', times.city);
+    console.log('[prayerService] Fetched OK — Asr (Hanafi):', times.asr, '| City:', city);
     return times;
   } catch (error) {
     console.error('[prayerService] API fetch failed:', error.message);
@@ -130,8 +143,8 @@ async function getPrayerTimes(forceRefresh = false) {
       hijri: { formatted: hijri.en, formattedAr: hijri.ar },
       gregorian: { formatted: new Date().toDateString() },
       error: error.message,
-      city: CONFIG.city,
-      timezone: CONFIG.timezone,
+      city: city,
+      timezone: timezone,
     };
   }
 }

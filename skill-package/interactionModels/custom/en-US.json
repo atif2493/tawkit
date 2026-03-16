@@ -32,10 +32,73 @@
             "when do I pray next"
           ]
         },
+        {
+          "name": "EidCountdownIntent",
+          "slots": [],
+          "samples": [
+            "how many days to Eid",
+            "when is Eid",
+            "how many days until Eid",
+            "how long until Eid",
+            "days to Eid",
+            "when is Eid al Fitr",
+            "when is Eid ul Fitr",
+            "how many days left in Ramadan",
+            "how many days of Ramadan left",
+            "when does Ramadan end",
+            "is it almost Eid"
+          ]
+        },
+        {
+          "name": "IftarTimeIntent",
+          "slots": [],
+          "samples": [
+            "when is iftar",
+            "what time is iftar",
+            "when do we break the fast",
+            "when can I eat",
+            "how long until iftar",
+            "how many hours until iftar",
+            "when is maghrib",
+            "what time is maghrib",
+            "iftar time",
+            "when can we break fast"
+          ]
+        },
+        {
+          "name": "SuhoorTimeIntent",
+          "slots": [],
+          "samples": [
+            "when is suhoor",
+            "what time is suhoor",
+            "when does suhoor end",
+            "when should I stop eating",
+            "suhoor time",
+            "sehri time",
+            "when is sehri",
+            "what time is fajr",
+            "when is fajr"
+          ]
+        },
+        {
+          "name": "HijriDateIntent",
+          "slots": [],
+          "samples": [
+            "what is the hijri date",
+            "what is the Islamic date",
+            "what day of Ramadan is it",
+            "which day of Ramadan",
+            "Islamic date",
+            "hijri date",
+            "what is today in the Islamic calendar"
+          ]
+        },
         { "name": "AMAZON.HelpIntent", "samples": [] },
         { "name": "AMAZON.StopIntent", "samples": [] },
         { "name": "AMAZON.CancelIntent", "samples": [] },
-        { "name": "AMAZON.FallbackIntent", "samples": [] }
+        { "name": "AMAZON.FallbackIntent", "samples": [] },
+        { "name": "AMAZON.PauseIntent", "samples": [] },
+        { "name": "AMAZON.ResumeIntent", "samples": [] }
       ],
       "types": []
     }

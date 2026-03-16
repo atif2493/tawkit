@@ -12,24 +12,19 @@ const REMINDER_OFFSETS = [15, 10, 5, 0]; // minutes before prayer
  * Get the device's full address from Alexa Device Address API.
  * Returns a formatted address string, or null if unavailable.
  */
-async function getDeviceAddress(handlerInput) {
+/**
+ * Get the raw address object from Alexa Device Address API.
+ * Returns { city, stateOrRegion, countryCode, postalCode, ... } or null.
+ */
+async function getDeviceAddressRaw(handlerInput) {
   try {
     const { deviceId } = handlerInput.requestEnvelope.context.System.device;
     const deviceAddressClient = handlerInput.serviceClientFactory.getDeviceAddressServiceClient();
     const address = await deviceAddressClient.getFullAddress(deviceId);
 
     if (address && (address.addressLine1 || address.city)) {
-      const parts = [
-        address.addressLine1,
-        address.addressLine2,
-        address.city,
-        address.stateOrRegion,
-        address.postalCode,
-        address.countryCode,
-      ].filter(Boolean);
-      const formatted = parts.join(', ');
-      console.log(`[reminderService] Device address: ${formatted}`);
-      return formatted;
+      console.log(`[reminderService] Device address: ${address.city}, ${address.stateOrRegion}, ${address.countryCode}`);
+      return address;
     }
     console.log('[reminderService] Device address empty or not set');
     return null;
@@ -37,6 +32,20 @@ async function getDeviceAddress(handlerInput) {
     console.warn('[reminderService] Could not get device address:', err.message);
     return null;
   }
+}
+
+async function getDeviceAddress(handlerInput) {
+  const address = await getDeviceAddressRaw(handlerInput);
+  if (!address) return null;
+  const parts = [
+    address.addressLine1,
+    address.addressLine2,
+    address.city,
+    address.stateOrRegion,
+    address.postalCode,
+    address.countryCode,
+  ].filter(Boolean);
+  return parts.join(', ');
 }
 
 /**
@@ -284,4 +293,4 @@ async function setRamadanReminders(handlerInput, prayerTimes, timezone, ramadanC
   return { success: true, count: remindersSet };
 }
 
-module.exports = { setPrayerReminders, setRamadanReminders, getTravelTime, buildReminderText, REMINDER_OFFSETS };
+module.exports = { setPrayerReminders, setRamadanReminders, getTravelTime, buildReminderText, getDeviceAddressRaw, REMINDER_OFFSETS };
