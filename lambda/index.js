@@ -18,7 +18,7 @@ let _lastAdhanPlayed = '';
 let _adhanPlayingUntil = 0; // timestamp (ms) — suppress PINGs while adhan is playing
 let _playIftarDuaNext = false; // flag to queue iftar dua after Maghrib adhan
 
-const ADHAN_DURATION_MS = 180000; // 3 minutes — full adhan is ~2:53
+const ADHAN_DURATION_MS = 300000; // 5 minutes — covers Fajr adhan (4:02) + buffer
 
 const S3_BUCKET = process.env.S3_BUCKET || 'my-prayer-time-content-357977905088';
 const S3_REGION = 'us-east-1';
@@ -389,29 +389,17 @@ const UserEventPingHandler = {
       // Set cooldown so subsequent PINGs don't interrupt the adhan
       _adhanPlayingUntil = Date.now() + ADHAN_DURATION_MS;
 
-      // Queue iftar dua after Maghrib adhan during Ramadan
+      // Play adhan via SSML <audio> — keeps APL screen visible and session alive
       const ramadan = getRamadanContext(prayerTimes, timezone);
-      _playIftarDuaNext = (adhan.prayerName === 'Maghrib' && ramadan.isRamadan);
-      if (_playIftarDuaNext) {
-        console.log('[index] Will play iftar dua after Maghrib adhan');
-      }
+      const isIftarAdhan = (adhan.prayerName === 'Maghrib' && ramadan.isRamadan);
 
-      // Use AudioPlayer directive — plays on device media channel, not interrupted by PINGs
-      response.addDirective({
-        type: 'AudioPlayer.Play',
-        playBehavior: 'REPLACE_ALL',
-        audioItem: {
-          stream: {
-            url: adhanUrl,
-            token: `adhan-${adhan.prayerName}-${Date.now()}`,
-            offsetInMilliseconds: 0,
-          },
-          metadata: {
-            title: `${adhan.prayerName} Adhan`,
-            subtitle: 'My Prayer Time',
-          },
-        },
-      });
+      let ssml = `<speak><audio src="${adhanUrl}" />`;
+      if (isIftarAdhan) {
+        console.log('[index] Will play iftar dua after Maghrib adhan');
+        ssml += `<break time="2s"/><audio src="${IFTAR_DUA_URL}" />`;
+      }
+      ssml += '</speak>';
+      response.speak(ssml);
     }
 
     response.reprompt(' ');
@@ -430,34 +418,8 @@ const AudioPlayerHandler = {
     console.log(`[index] AudioPlayer event: ${requestType}`);
 
     if (requestType === 'AudioPlayer.PlaybackFinished') {
-      // Check if we need to play iftar dua after Maghrib adhan
-      if (_playIftarDuaNext) {
-        _playIftarDuaNext = false;
-        console.log('[index] Maghrib adhan finished — playing iftar dua');
-        // Keep cooldown active for the dua duration (~10 seconds)
-        _adhanPlayingUntil = Date.now() + 15000;
-        return handlerInput.responseBuilder
-          .addDirective({
-            type: 'AudioPlayer.Play',
-            playBehavior: 'REPLACE_ALL',
-            audioItem: {
-              stream: {
-                url: IFTAR_DUA_URL,
-                token: `iftar-dua-${Date.now()}`,
-                offsetInMilliseconds: 0,
-              },
-              metadata: {
-                title: 'Iftar Dua',
-                subtitle: 'Break your fast - Bismillah',
-              },
-            },
-          })
-          .getResponse();
-      }
-
-      // Adhan/dua finished — clear cooldown so PINGs resume normally
       _adhanPlayingUntil = 0;
-      console.log('[index] Audio playback finished — resuming normal PINGs');
+      console.log('[index] Audio playback finished — cooldown cleared');
     }
 
     return handlerInput.responseBuilder.getResponse();
