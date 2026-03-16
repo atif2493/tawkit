@@ -1,36 +1,47 @@
 # Functional Design Document (FDD)
-## Tawkit Echo — Islamic Prayer Times Alexa Skill
-### Version 1.0 | March 2026
+## My Prayer Time — Islamic Prayer Times Alexa Skill
+### Version 1.1 | March 2026
 
 ---
 
 ## 1. Overview
 
 ### 1.1 Purpose
-Tawkit Echo is an Alexa Skill with APL (Alexa Presentation Language) visual display, designed to run on Amazon Echo Show devices. It replicates the core functionality of tawkit.net — displaying Islamic prayer times, countdown to next prayer, Adhan audio alerts, and rotating Quran verses/Hadiths — as a persistent home screen widget on Echo Show.
+My Prayer Time is an Alexa Skill with APL (Alexa Presentation Language) visual display, designed to run on Amazon Echo Show devices. It displays Islamic prayer times, live countdown to next prayer, automatic Adhan audio at prayer times, Iftar dua during Ramadan, location-aware prayer calculations, voice Q&A for family interaction, and rotating Quran verses & Hadiths — as a persistent full-screen display on Echo Show.
 
 ### 1.2 Motivation
 - The existing Tawkit offline HTML/JS app (`m2body.js`) is intentionally obfuscated and cannot run natively on Echo Show
 - Echo Show's Silk Browser does not maintain persistence through screensaver
-- A native Alexa Skill with APL widget persists on the Echo Show home screen
+- A native Alexa Skill with APL persists on the Echo Show screen
 - Target users: Muslim households wanting a dedicated always-visible prayer times display
+- Family-friendly: Kids can ask voice questions about Eid, iftar, suhoor, etc.
 
 ### 1.3 Madhab & Location
-- **Juristic School:** Hanafi (`school=1` in AlAdhan API) — affects Asr prayer time only (later than Shafi/standard)
-- **Default City:** Apex, NC, USA
-- **Location input:** City name + country + state (no lat/lng required from user)
-- **API endpoint used:** `timingsByCity` — AlAdhan resolves coordinates automatically from city name
+- **Juristic School:** Configurable (`school=0` Shafi'i default, `school=1` Hanafi) — affects Asr prayer time only
+- **Location Detection:** Alexa Device Address API (auto-detects user's city/state/country)
+- **Fallback City:** Apex, NC, USA (via environment variables)
+- **API endpoint:** `timingsByCity` — AlAdhan resolves coordinates automatically from city name
+- **Timezone:** Auto-mapped from US state abbreviation (50 states + DC)
 
-### 1.4 Scope (v1.0)
-| In Scope | Out of Scope |
+### 1.4 Scope
+
+| In Scope (v1.0-1.1) | Out of Scope (v2+) |
 |---|---|
 | Prayer times display (5 daily prayers) | Multi-mosque admin portal |
-| Countdown to next prayer | User accounts / login |
-| Adhan audio on prayer time | Azkar post-prayer screens |
-| Quran verse / Hadith rotation | Iqama countdown |
-| Hijri + Gregorian date display | Custom CSV prayer time upload |
-| Auto-calculate from location | Screen themes / backgrounds |
-| Single fixed home location | Jumah (Friday) special handling |
+| Live countdown to next prayer (circle widget) | User accounts / login |
+| Automatic Adhan audio via SSML at prayer time | Azkar post-prayer screens |
+| Separate Fajr Adhan (Makkah, Sheikh Ali Mullah) | Custom CSV prayer time upload |
+| Iftar dua auto-play after Maghrib (Ramadan) | Screen themes / backgrounds |
+| Location-aware via Device Address API | Multi-device Adhan broadcasting |
+| Voice Q&A (Eid, iftar, suhoor, hijri date) | English translations of Hadiths |
+| Quran verse / Hadith rotation | Iqama countdown timer |
+| Hijri + Gregorian date display with moon phase | Multiple language support |
+| Ramadan companion (suhoor/iftar/last 10/zakat) | DynamoDB user preferences |
+| Dhul Hijjah banners (Arafah, Eid, Tashreeq) | Admin web UI |
+| Jumuah (Friday) prayer card | Madhab selection UI |
+| Iqama times display per prayer | |
+| Prayer reminders with travel time (Google Maps) | |
+| Permissions consent card for location setup | |
 
 ---
 
@@ -42,364 +53,482 @@ Tawkit Echo is an Alexa Skill with APL (Alexa Presentation Language) visual disp
 ┌─────────────────────────────────────────────────────────────┐
 │                    Echo Show Device                          │
 │  ┌─────────────────────────────────────────────────────┐   │
-│  │              APL Widget (Home Screen)                │   │
+│  │           APL Full-Screen Display                    │   │
 │  │  ┌──────────────────────────────────────────────┐   │   │
-│  │  │  Prayer Times Grid  |  Next Prayer Countdown  │   │   │
-│  │  │  Hadith / Quran Verse (rotating)              │   │   │
-│  │  │  Hijri Date | Gregorian Date | Weather        │   │   │
+│  │  │  Header: Title | Hijri Date | [Countdown ⭕]  │   │   │
+│  │  │  Ramadan Banners (fast day, iftar, last 10)  │   │   │
+│  │  │  Large Clock + Gregorian Date                │   │   │
+│  │  │  Prayer Cards: Fajr|Dhuhr|Asar|Maghrib|Isha │   │   │
 │  │  └──────────────────────────────────────────────┘   │   │
 │  └──────────────────────┬──────────────────────────────┘   │
 └─────────────────────────┼───────────────────────────────────┘
                           │ Alexa Infrastructure
 ┌─────────────────────────▼───────────────────────────────────┐
-│                     AWS Lambda                               │
-│   Handler: getPrayerTimes()                                  │
-│   - Fetch times from AlAdhan API                            │
-│   - Calculate next prayer + countdown                        │
-│   - Select Hadith (rotating index)                          │
-│   - Build APL datasource payload                            │
+│                     AWS Lambda (Node.js 20.x)                │
+│   ├── Device Address API → get user's location              │
+│   ├── AlAdhan API → fetch prayer times for location         │
+│   ├── Build APL datasource + SSML adhan audio               │
+│   ├── Voice Q&A intent handlers                             │
+│   └── Reminder service (prayer + Ramadan reminders)         │
 └───┬─────────────────────┬────────────────────┬──────────────┘
     │                     │                    │
-┌───▼────────┐  ┌─────────▼──────┐  ┌─────────▼──────────┐
-│  AlAdhan   │  │  EventBridge   │  │    S3 Bucket        │
-│  API       │  │  (5 rules,     │  │  - adhan-fajr.mp3   │
-│  (Free,    │  │   one per      │  │  - adhan-normal.mp3 │
-│  no auth)  │  │   prayer time) │  │  - content.json     │
-└────────────┘  └────────────────┘  └────────────────────┘
+┌───▼────────┐  ┌─────────▼──────┐  ┌─────────▼──────────────┐
+│  AlAdhan   │  │  EventBridge   │  │    S3 Bucket            │
+│  API       │  │  (5 prayer +   │  │  - adhan.mp3 (2:53)     │
+│  (Free,    │  │   midnight     │  │  - adhan-fajr.mp3 (4:02)│
+│  no auth)  │  │   reset rules) │  │  - iftar-dua-2.mp3      │
+└────────────┘  └────────────────┘  │  - noop.mp4             │
+                                    └─────────────────────────┘
 ```
 
 ### 2.2 Technology Stack
 
 | Layer | Technology | Justification |
 |---|---|---|
-| Skill Frontend | APL 2024.1 + APL-W | Native Echo Show widget support |
+| Skill Frontend | APL 2024.1 | Native Echo Show full-screen support |
 | Backend | Node.js 20.x Lambda | ASK SDK v2 support, lightweight |
 | Prayer Data | AlAdhan.com REST API | Free, reliable, no auth needed |
-| Scheduling | Amazon EventBridge | Cron-based prayer time triggers |
-| Audio | Alexa AudioPlayer + S3 | MP3 Adhan delivery |
-| Content | JSON flat files in S3 | Hadiths, Quran verses, duas |
+| Location | Alexa Device Address API | Auto-detects user address from device registration |
+| Scheduling | Amazon EventBridge | Cron-based prayer time triggers + midnight reset |
+| Audio | SSML `<audio>` tags + S3 | Keeps APL screen visible during playback |
+| Content | JSON flat files bundled in Lambda | Hadiths, Quran verses, Ramadan duas |
 | IaC | AWS SAM | Lightweight, Alexa-native |
-| CI/CD | GitHub Actions + ASK CLI | Automated deploy pipeline |
+| Skill Deploy | ASK CLI (SMAPI) | Interaction model deployment |
 
 ### 2.3 Data Flow
 
 ```
-1. User opens Echo Show → Widget renders on home screen
-2. EventBridge triggers Lambda at each prayer time
-3. Lambda calls AlAdhan API → gets today's prayer times
-4. Lambda calculates next prayer + seconds until it
-5. Lambda selects next Hadith (round-robin from S3 JSON)
-6. Lambda builds APL datasource → pushes to widget via 
-   Alexa Proactive Events API
-7. At prayer time → Lambda triggers AudioPlayer → plays Adhan MP3
-8. Widget auto-refreshes every 60 seconds for countdown accuracy
+1. User says "Alexa, open My Prayer Time"
+2. LaunchRequest → Lambda invoked
+3. Lambda calls Device Address API → gets user's city/state/country
+4. Lambda maps US state to IANA timezone
+5. Lambda calls AlAdhan API with user's location → gets prayer times
+6. Lambda builds APL datasource (prayers, countdown, Ramadan context, content)
+7. APL rendered full-screen on Echo Show
+8. Every 15 seconds: APL handleTick fires SendEvent("PING")
+9. Lambda receives PING → re-renders APL with updated countdown/time
+10. At prayer time: PING detects match → plays adhan via SSML <audio>
+11. At Maghrib (Ramadan): adhan + 2s pause + iftar dua plays
+12. Session stays alive indefinitely via PING keep-alive
 ```
+
+### 2.4 Adhan Playback Flow
+
+```
+PING fires (every 15s) → checkAdhanTime()
+  |
+  Is current time within 1-min window of any prayer? → NO → normal re-render
+  |
+  YES → Has this prayer's adhan already played? → YES → skip
+  |
+  NO → Build SSML:
+    Normal prayer: <speak><audio src="adhan.mp3"/></speak>
+    Fajr:          <speak><audio src="adhan-fajr.mp3"/></speak>
+    Maghrib+Ramadan: <speak><audio src="adhan.mp3"/><break time="2s"/><audio src="iftar-dua-2.mp3"/></speak>
+  |
+  Set cooldown (_adhanPlayingUntil = now + 5 minutes)
+  |
+  During cooldown: PINGs keep session alive but skip re-render
+  |
+  After cooldown: next PING re-renders APL normally
+```
+
+**Why SSML instead of AudioPlayer:**
+- AudioPlayer directive takes over the Echo Show screen (hides APL, shows audio player UI)
+- AudioPlayer events (PlaybackFinished) are out-of-session — cannot send APL directives in response
+- Lambda instances may differ between Play and PlaybackFinished events (cold starts)
+- SSML `<audio>` keeps APL screen visible during playback and maintains session
 
 ---
 
 ## 3. Functional Requirements
 
-### 3.1 Prayer Times Display
+### 3.1 Location Detection
 
-**FR-001: Display 5 Daily Prayer Times**
-- Display Fajr, Dhuhr, Asr, Maghrib, Isha times
-- Format: 12-hour AM/PM (configurable to 24hr in v2)
-- Highlight the current/next prayer visually
-- Dim/grey out past prayers for the day
+**FR-001: Auto-Detect User Location**
+- On first launch, call Alexa Device Address API to get device's registered address
+- Extract city, stateOrRegion, countryCode from address object
+- Map US state abbreviation to IANA timezone (all 50 states + DC)
+- Cache device location per Lambda warm instance
+- Fall back to environment variables if permission not granted
 
-**FR-002: Prayer Time Source**
+**FR-002: Location Permission Prompt**
+- If Device Address permission not granted, speak setup instructions
+- Show Alexa Permissions Consent Card (`read::alexa:device:all:address`)
+- Continue showing prayer times for default location
+
+### 3.2 Prayer Times Display
+
+**FR-003: Display 5 Daily Prayer Times**
+- Display Fajr, Dhuhr, Asar, Maghrib, Eaisha times in 12-hour AM/PM format
+- Highlight the next prayer card with green border/background
+- Display iqama time below each prayer time
+- Show Jumuah card on Fridays with two khutbah times
+
+**FR-004: Prayer Time Source**
 - Endpoint: `https://api.aladhan.com/v1/timingsByCity`
-- Parameters: `city`, `country`, `state`, `method`, `school`
-- Calculation method: ISNA (`method=2`) — standard for North America
-- Juristic school: **Hanafi** (`school=1`) — gives later Asr time per Hanafi madhab
-- Refresh: Once per day at midnight + on skill launch
-- Fallback: Cache previous day's times if API unavailable
+- Parameters: `city`, `country`, `state`, `method`, `school` (from device location or env vars)
+- Cache key: `{date}:{city}:{state}:{country}` — invalidates on date or location change
+- Fallback: Return cached times if API unavailable
 
-```
-GET https://api.aladhan.com/v1/timingsByCity
-  ?city=Apex
-  &country=US
-  &state=NC
-  &method=2
-  &school=1        ← Hanafi Asr
-```
+### 3.3 Countdown Timer
 
-**FR-003: Location Configuration**
-- Default city: **Apex, NC, USA**
-- Input: City name + State + Country (human-readable, no lat/lng needed)
-- AlAdhan API resolves coordinates automatically from city name
-- Configurable via environment variables (`PRAYER_CITY`, `PRAYER_STATE`, `PRAYER_COUNTRY`)
-- User-editable location via Alexa account settings (v2)
+**FR-005: Next Prayer Countdown**
+- Display countdown in circle widget (absolute positioned, top-right)
+- Format: `Xh Xm` or `NOW` when active
+- Show prayer name and "at X:XX PM" below countdown
+- Circle: 145dp diameter, green border, light green background
+- Update every 15 seconds via PING
 
-### 3.2 Countdown Timer
+### 3.4 Adhan Audio
 
-**FR-004: Next Prayer Countdown**
-- Display time remaining until next prayer in `Xh Xm` format
-- Update every 60 seconds via APL auto-refresh
-- When countdown < 10 minutes: change color to amber
-- When countdown < 1 minute: change color to red
-- After prayer time passes: immediately switch to next prayer
+**FR-006: Automatic Adhan at Prayer Time**
+- Play adhan via SSML `<audio>` within 1-minute window of prayer time
+- Fajr: Makkah Fajr adhan (Sheikh Ali Mullah, 4:02)
+- Dhuhr/Asr/Maghrib/Isha: Standard adhan (2:53)
+- 5-minute cooldown prevents duplicate playback
+- APL screen remains visible during playback
+- Duplicate prevention: `_lastAdhanPlayed` tracks `{prayerName}-{time}` key
 
-### 3.3 Adhan Audio
+**FR-007: Iftar Dua Auto-Play (Ramadan)**
+- At Maghrib during Ramadan, chain iftar dua after adhan in SSML:
+  `<audio adhan/><break 2s/><audio iftar-dua-2.mp3/>`
+- Dua: "Dhahaba az-zama'u, wabtallatil-'urooq, wa thabatal-ajru in sha Allah" (23 seconds)
+- Two dua MP3s available on S3 (iftar-dua-1.mp3 and iftar-dua-2.mp3)
 
-**FR-005: Adhan at Prayer Time**
-- Play Adhan MP3 automatically at each prayer time
-- Fajr prayer: play Fajr-specific Adhan (has "As-salatu khayrun minan-nawm")
-- All other prayers: play standard Adhan
-- Audio files stored in S3, served via CloudFront
-- Duration: ~2 minutes per Adhan
-- User can tap screen to stop early
+### 3.5 Voice Q&A
 
-**FR-006: Audio Trigger Mechanism**
-- EventBridge rule fires at each prayer time (dynamic, recalculated daily)
-- Lambda invokes Alexa Proactive Events API → triggers audio
-- Fallback: User voice command "Alexa, play Adhan"
+**FR-008: Eid Countdown**
+- Intent: `EidCountdownIntent`
+- Triggers: "How many days to Eid?", "When does Ramadan end?", etc.
+- Response: Current Ramadan day, days remaining, Eid estimate date
+- Outside Ramadan: "We are not currently in Ramadan"
 
-### 3.4 Hadith / Quran Verse Rotation
+**FR-009: Iftar Time**
+- Intent: `IftarTimeIntent`
+- Triggers: "When is iftar?", "What time is Maghrib?", etc.
+- During Ramadan with iftar banner: Maghrib time + countdown
+- Otherwise: Maghrib prayer time
 
-**FR-007: Content Rotation**
-- Display one Hadith or Quran verse at bottom of widget
-- Rotate every 30 seconds
-- Content source: `content.json` in S3 (ported from `ahadith.js` and `messages-slides.js`)
-- Total content pool: ~120 items (100 Hadiths + 17 Quran verses/duas + 3 messages)
-- Language: Arabic text with transliteration (v2: English translation)
+**FR-010: Suhoor Time**
+- Intent: `SuhoorTimeIntent`
+- Triggers: "When is suhoor?", "What time is Fajr?", etc.
+- During Ramadan with suhoor banner: Fajr time + countdown + reminder
+- Otherwise: Fajr prayer time
+
+**FR-011: Hijri Date**
+- Intent: `HijriDateIntent`
+- Triggers: "What is the Islamic date?", "What day of Ramadan?", etc.
+- Response: Full hijri date + Ramadan day number if applicable
+
+**FR-012: Session Continuity**
+- All voice Q&A intents keep session open (`withShouldEndSession(false)`)
+- Users can ask follow-up questions without re-opening the skill
+- Reprompt: "Ask me another question."
+
+### 3.6 Hadith / Quran Verse Rotation
+
+**FR-013: Content Rotation**
+- Display one Hadith or Quran verse (selected at render time)
+- Content source: `content.json` bundled in Lambda
+- Total pool: ~120 items (100 Hadiths + 17 Quran verses/duas + 3 messages)
+- Language: Arabic text
 - Rotation order: Sequential (not random) to ensure all content shown
 
-**FR-008: Content File Structure**
-```json
-{
-  "hadiths": [
-    { "id": 1, "text": "قالَ ﷺ : خيركم من تعلم القرآن وعلمه", "source": "البخاري" },
-    ...
-  ],
-  "verses": [
-    { "id": 1, "text": "﴿ رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً ﴾", "surah": "البقرة" },
-    ...
-  ]
-}
-```
+### 3.7 Ramadan Companion
 
-### 3.5 Date Display
+**FR-014: Ramadan Banners**
+- Auto-detected from Hijri month (Ramadan = month 9)
+- Banners displayed left-aligned, width 73vw (avoids countdown circle)
+- **Fast Day banner**: "Fast Day X of 30 · Eid al-Fitr in ~Y days (~Mar Z)"
+- **Suhoor banner**: "Suhoor ends in Xh Ym · Fajr at X:XX AM" (with urgency colors)
+- **Iftar banner**: "Iftar in Xh Ym · Maghrib at X:XX PM" + Arabic dua (maxLines: 2)
+- **Last 10 Nights**: "Night X of Last 10 · Seek Laylat al-Qadr!" + dua
+- **Zakat reminder**: Days 25-30: "Remember to pay Zakat al-Fitr before Eid prayer"
+- Banner spacing: 14dp, font: 21dp (Arabic dua: 19dp)
 
-**FR-009: Dual Calendar Display**
-- Show Gregorian date: "Tuesday, March 10, 2026"
-- Show Hijri date: "10 Ramadan 1447" 
-- Hijri calculation: Use AlAdhan API's built-in Hijri date field
-- No external Hijri library needed
+**FR-015: Iftar Dua Display**
+- Arabic dua text shown in iftar banner when `showDua` is true
+- `maxLines: 2` with `wrap: "wrap"` to prevent overflow
 
-### 3.6 Widget Persistence
+### 3.8 Dhul Hijjah & Hajj
 
-**FR-010: Echo Show Home Screen Persistence**
-- Widget renders as Alexa Home Screen Widget
-- Persists through Echo Show screensaver
-- Visible without any voice command or interaction
-- Tapping widget → launches full skill view with audio
+**FR-016: Dhul Hijjah Banners**
+- Auto-detected from Hijri month (Dhul Hijjah = month 12)
+- **First 10 Days**: "Day X of Dhul Hijjah · Best 10 Days of the Year"
+- **Hajj Countdown**: Days until 9th Dhul Hijjah
+- **Day of Arafah** (9th): Fasting recommendation
+- **Eid al-Adha** (10th): "Eid al-Adha Mubarak!" + Arabic greeting
+- **Days of Tashreeq** (11th-13th): Takbeer reminder
+
+### 3.9 Date Display
+
+**FR-017: Dual Calendar Display**
+- Gregorian: "Sunday, 15 March 2026" (below clock)
+- Hijri: "26 Ramadan 1447" (header, right side) with moon phase emoji
+- City name + madhab displayed under Hijri date
+- Font sizes: moon 28dp, Hijri 22dp, city 17dp (with `shrink: 1`)
+
+### 3.10 Persistent Display
+
+**FR-018: Screen Persistence**
+- APL `handleTick` fires SendEvent("PING") every 15 seconds
+- Lambda responds to PING with re-rendered APL + `withShouldEndSession(false)`
+- Silent `noop.mp4` video plays in background (1px, off-screen) for keep-alive
+- Screen stays on My Prayer Time until user says "Alexa, stop"
 
 ---
 
 ## 4. Non-Functional Requirements
 
 ### 4.1 Performance
-- Widget initial render: < 2 seconds
-- Prayer time API response: < 500ms (AlAdhan SLA)
-- Countdown update latency: ≤ 60 seconds drift max
-- Adhan trigger accuracy: ± 30 seconds of actual prayer time
+- APL initial render: < 2 seconds
+- Prayer time API response: < 500ms (AlAdhan)
+- Device Address API: < 300ms (cached per warm instance)
+- Countdown update latency: ≤ 15 seconds drift (PING interval)
+- Adhan trigger accuracy: within 1-minute window of prayer time
 
 ### 4.2 Availability
 - AlAdhan API uptime: 99.5% (community-maintained, historically reliable)
 - Lambda cold start: < 1 second (Node.js, minimal dependencies)
 - Graceful degradation: Show cached times if API call fails
+- Location fallback: Env var defaults if Device Address API unavailable
 
 ### 4.3 Cost
 | Resource | Free Tier Limit | Expected Usage | Cost |
 |---|---|---|---|
-| Lambda invocations | 1M/month | ~4,500/month | $0 |
-| EventBridge events | 14M/month | ~150/month | $0 |
-| S3 storage | 5GB | <1MB | $0 |
-| S3 requests | 20K GET/month | ~300/month | $0 |
+| Lambda invocations | 1M/month | ~122K/month | $0 |
+| Lambda compute | 400K GB-sec/month | ~30K GB-sec/month | $0 |
+| EventBridge events | 14M/month | ~200/month | $0 |
+| S3 storage | 5GB | ~5MB | $0 |
+| S3 requests | 20K GET/month | ~500/month | $0 |
+| CloudWatch Logs | 5GB ingest | ~20MB/month | $0 |
 | **Total** | | | **$0/month** |
+| **Post free-tier** | | | **~$0.10/month** |
 
 ### 4.4 Security
-- No PII stored (location is city name in env vars in v1)
-- No DynamoDB in v1 (stateless Lambda)
-- S3 bucket: private, served via CloudFront signed URLs for audio
-- IAM: Lambda role with least-privilege (S3 read, EventBridge read only)
+- Device Address: Read-only, user must explicitly grant permission
+- No PII stored in Lambda or S3
+- No DynamoDB (stateless Lambda)
+- S3 bucket: Public read on `audio/*` prefix only
+- IAM: Lambda role with least-privilege
+- SKILL_ID validation on all requests
 
 ---
 
 ## 5. APL Screen Design
 
-### 5.1 Main Widget Layout (Echo Show 10 — 1280×800)
+### 5.1 Main Screen Layout (Echo Show — 1280x800)
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│  🕌 TAWKIT                    Tuesday, 10 March 2026         │
-│                               10 Ramadan 1447                │
-├─────────┬──────────┬──────────┬──────────┬───────────────────┤
-│  FAJR   │  DHUHR   │   ASR    │ MAGHRIB  │      ISHA         │
-│  05:12  │  12:31   │  15:48   │  18:19   │     19:45         │
-│   ✅    │   ✅     │   🔜    │          │                   │
-├──────────────────────────────────────────────────────────────┤
-│          ⏱  Next Prayer: Asr  —  in  1h 23m  45s            │
-│          ████████████████████░░░░░░░░░░░░░░  (progress bar) │
-├──────────────────────────────────────────────────────────────┤
-│  قالَ ﷺ : خيركم من تعلم القرآن وعلمه                      │
-│                                          — رواه البخاري      │
-└──────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│ ☪ My Prayer Time          🌔 26 Ramadan 1447            │
+│                            Apex · Hanafi    ┌─────────┐ │
+│ ─────────────────────────────────────────── │  1h 43m │ │
+│ 🌙 Fast Day 26 · Eid in ~5 days (~Mar 20)  │ ━━━━━━━ │ │
+│ 🍽️ Iftar in 1h 43m · Maghrib at 7:23 PM    │ Maghrib │ │
+│ ✨ Night 6 of Last 10 · Arabic dua...       │at 7:23PM│ │
+│ 💰 Remember Zakat al-Fitr                   └─────────┘ │
+│                                                          │
+│                    5:36 PM                               │
+│              Sunday, 15 March 2026                       │
+│                                                          │
+│ ┌──────┐┌──────┐┌──────┐┌────────┐┌──────┐             │
+│ │ Fajr ││Dhuhr ││ Asar ││Maghrib ││Eaisha│             │
+│ │6:16AM││1:24PM││4:48PM││ 7:23PM ││8:33PM│             │
+│ │Iqama ││Iqama ││Iqama ││ Iqama  ││Iqama │             │
+│ │6:30AM││1:30PM││5:30PM││ 7:25PM ││9:15PM│             │
+└──────────────────────────────────────────────────────────┘
 ```
 
 ### 5.2 Color Scheme
 | Element | Color | Hex |
 |---|---|---|
-| Background | Deep navy | `#0D1B2A` |
-| Prayer time text | Gold | `#D4AF37` |
-| Next prayer highlight | Bright white | `#FFFFFF` |
-| Past prayer | Dimmed grey | `#4A4A4A` |
-| Countdown urgent (<10m) | Amber | `#FFA500` |
-| Countdown critical (<1m) | Red | `#FF4444` |
-| Hadith text | Soft white | `#E8E8E8` |
-| Header | Teal accent | `#4ECDC4` |
+| Background | Cream | `#FDF5E6` |
+| Primary green (title, borders) | Dark green | `#0D7039` |
+| Prayer card background | Light grey | `#F0F0F0` |
+| Next prayer highlight | Green tint | `rgba(13,112,57,0.12)` |
+| Clock text | Dark | `#24332A` |
+| Subtitle text | Grey | `#50575C` |
+| Hijri date | Gold | `#95773E` |
+| Countdown circle border | Green | `#0D7039` |
+| Suhoor/Iftar urgent | Red | `#DB655E` |
+| Suhoor/Iftar warning | Gold | `#D8B65F` |
+| Last 10 nights | Gold | `#D8B65F` |
+| Separator line | Green | `#0D7039` |
 
 ### 5.3 Typography
-- Prayer times: Bold, 42dp
-- Countdown: Bold, 36dp  
-- Hadith/Verse: Regular, 22dp, right-to-left for Arabic
-- Date: Regular, 20dp
+- App title: Bold, 40.5dp, green
+- Clock: Light (200 weight), 104.5dp
+- Prayer card name: Bold, 24dp
+- Prayer card time: Bold, 26dp
+- Iqama time: Bold, 22dp, green
+- Banner text: Bold, 21dp
+- Arabic dua text: 19dp
+- Hijri date: 22dp, gold
+- Countdown in circle: Bold, 30dp
+
+### 5.4 Key APL Properties
+- Countdown circle: `position: "absolute"`, `right: "4vw"`, `top: "14vh"`, 145dp diameter
+- Ramadan/Dhul Hijjah banners: `width: "73vw"` (avoids circle overlap)
+- Banner container: `wrap: "wrap"`, Arabic text `maxLines: 2`
+- Prayer cards: `height: "34vh"`, `justifyContent: "spaceEvenly"`
+- Clock section: `grow: 1` (fills remaining vertical space)
+- PING interval: 15 seconds via `handleTick`
 
 ---
 
 ## 6. API Contracts
 
-### 6.1 AlAdhan API
+### 6.1 Alexa Device Address API
+```
+Client: handlerInput.serviceClientFactory.getDeviceAddressServiceClient()
+Method: getFullAddress(deviceId)
+
+Response fields used:
+  address.city           → "Apex"
+  address.stateOrRegion  → "NC"
+  address.countryCode    → "US"
+  address.postalCode     → "27502"
+
+Permission required: alexa::devices:all:address:full:read
+```
+
+### 6.2 AlAdhan API
 ```
 Endpoint: GET https://api.aladhan.com/v1/timingsByCity/{date}
 Params:
-  city     = "Apex"
-  country  = "US"
-  state    = "NC"
+  city     = "{deviceCity}"     (from Device Address or env var)
+  country  = "{deviceCountry}"
+  state    = "{deviceState}"
   method   = 2      (ISNA — North America)
-  school   = 1      (Hanafi — affects Asr only, gives later time)
+  school   = 0      (Shafi'i default, configurable)
 
 Response fields used:
   data.timings.Fajr    → "05:12"
   data.timings.Dhuhr   → "12:31"
-  data.timings.Asr     → "16:15"  ← Hanafi Asr (later than Shafi "15:48")
+  data.timings.Asr     → "16:15"
   data.timings.Maghrib → "18:19"
   data.timings.Isha    → "19:45"
   data.date.hijri.day        → "10"
   data.date.hijri.month.en   → "Ramadan"
   data.date.hijri.year       → "1447"
 
-Note: school=1 (Hanafi) only changes Asr. All other prayers identical to school=0.
+Cache key: {date}:{city}:{state}:{country}
 ```
 
-### 6.2 Lambda Response to Alexa
-```json
-{
-  "prayerTimes": {
-    "fajr": "05:12", "dhuhr": "12:31",
-    "asr": "15:48", "maghrib": "18:19", "isha": "19:45"
-  },
-  "nextPrayer": { "name": "Asr", "time": "15:48", "secondsUntil": 4980 },
-  "hijriDate": "10 Ramadan 1447",
-  "gregorianDate": "Tuesday, 10 March 2026",
-  "hadith": { "text": "قالَ ﷺ : خيركم من تعلم القرآن وعلمه", "source": "البخاري" },
-  "contentIndex": 42
-}
+### 6.3 Google Maps Directions API (Optional)
+```
+Endpoint: GET https://maps.googleapis.com/maps/api/directions/json
+Params:
+  origin      = "{deviceAddress}" or HOME_ADDRESS env var
+  destination = MOSQUE_ADDRESS env var
+  key         = GOOGLE_MAPS_API_KEY env var
+  departure_time = now
+  traffic_model  = best_guess
+
+Response: duration_in_traffic.value (seconds) → converted to minutes
+Fallback: TRAVEL_TIME_FALLBACK env var (default 12 minutes)
 ```
 
 ---
 
-## 7. Project File Structure
+## 7. S3 Audio Files
+
+| File | Size | Duration | Source | Used For |
+|---|---|---|---|---|
+| `adhan.mp3` | 1.0 MB | 2:53 | Standard adhan | Dhuhr, Asr, Maghrib, Isha |
+| `adhan-fajr.mp3` | 2.8 MB | 4:02 | Sheikh Ali Mullah, Makkah (Internet Archive) | Fajr |
+| `iftar-dua-1.mp3` | 197 KB | 0:08 | NooreSunnat.com | Allahumma inni laka sumtu... |
+| `iftar-dua-2.mp3` | 548 KB | 0:23 | Internet Archive | Dhahaba az-zama'u... (**default**) |
+| `noop.mp4` | 3.5 KB | -- | Generated | Silent video for APL keep-alive |
+
+---
+
+## 8. Interaction Model (Voice Intents)
+
+| Intent | Sample Utterances | Slots |
+|---|---|---|
+| `PrayerTimesIntent` | "prayer times", "show prayer times", "salah times" | None |
+| `NextPrayerIntent` | "next prayer", "when is the next prayer" | None |
+| `EidCountdownIntent` | "how many days to Eid", "when does Ramadan end" | None |
+| `IftarTimeIntent` | "when is iftar", "what time is maghrib" | None |
+| `SuhoorTimeIntent` | "when is suhoor", "what time is fajr" | None |
+| `HijriDateIntent` | "what is the Islamic date", "what day of Ramadan" | None |
+| `AMAZON.HelpIntent` | "help" | Built-in |
+| `AMAZON.StopIntent` | "stop" | Built-in |
+| `AMAZON.CancelIntent` | "cancel" | Built-in |
+| `AMAZON.FallbackIntent` | (unrecognized) | Built-in |
+| `AMAZON.PauseIntent` | "pause" | Required for AudioPlayer |
+| `AMAZON.ResumeIntent` | "resume" | Required for AudioPlayer |
+
+---
+
+## 9. Project File Structure
 
 ```
-tawkit-echo/
-├── README.md
-├── FDD.md
-├── .cursorrules
-├── template.yaml                    # AWS SAM template
-├── package.json
-│
-├── lambda/
-│   ├── index.js                     # Main Alexa skill handler
-│   ├── prayerService.js             # AlAdhan API integration
-│   ├── contentService.js            # Hadith/verse rotation logic
-│   ├── hijriService.js              # Hijri date formatting
-│   ├── countdownService.js          # Next prayer + countdown calc
-│   └── aplBuilder.js                # Builds APL datasource payload
-│
-├── apl/
-│   ├── widget.json                  # APL-W home screen widget
-│   ├── mainScreen.json              # Full skill APL screen
-│   └── styles.json                  # Shared APL styles
-│
-├── content/
-│   ├── content.json                 # Hadiths + Quran verses
-│   └── audio/
-│       ├── adhan-fajr.mp3           # Fajr Adhan
-│       └── adhan-normal.mp3         # Standard Adhan
-│
+tawkit/
+├── lambda/                      # Lambda handler (SAM CodeUri: ./lambda)
+│   ├── index.js                 # Entry point: handlers, adhan SSML, PING, voice Q&A, location
+│   ├── prayerService.js         # AlAdhan API + caching + location override
+│   ├── contentService.js        # Hadith/verse sequential rotation
+│   ├── countdownService.js      # Next prayer countdown + formatting
+│   ├── aplBuilder.js            # APL datasource + directive builder
+│   ├── reminderService.js       # Reminders + Device Address API + Google Maps travel time
+│   ├── ramadanService.js        # Ramadan context (suhoor, iftar, last 10, zakat, eid countdown)
+│   ├── hajjService.js           # Dhul Hijjah context (Arafah, Eid al-Adha, Tashreeq)
+│   ├── hijriService.js          # Hijri date fallback calculation
+│   ├── apl/
+│   │   ├── mainScreen.json      # APL document (absolute circle, tick keep-alive, 73vw banners)
+│   │   └── widget.json          # Echo Show home widget
+│   ├── content/
+│   │   ├── content.json         # 120+ Hadiths & Quran verses
+│   │   └── ramadan.json         # Ramadan duas (suhoor intention, iftar, laylat al-qadr)
+│   └── package.json
 ├── skill-package/
-│   ├── skill.json                   # Alexa skill manifest
-│   └── interactionModels/
-│       └── custom/
-│           └── en-US.json           # Voice interaction model
-│
-├── scripts/
-│   ├── port-ahadith.js              # Migrate ahadith.js → content.json
-│   ├── port-slides.js               # Migrate messages-slides.js → content.json
-│   └── deploy.sh                    # SAM deploy helper
-│
-└── .github/
-    └── workflows/
-        └── deploy.yml               # CI/CD pipeline
+│   ├── skill.json               # Manifest (APL + AudioPlayer + Device Address permission)
+│   └── interactionModels/custom/en-US.json  # 6 custom + 6 built-in intents
+├── template.yaml                # AWS SAM (Lambda, S3, EventBridge, 18+ parameters)
+├── events/launch.json           # Test event for sam local invoke
+├── scripts/                     # deploy.sh, port-ahadith.js, port-slides.js
+├── CLAUDE.md                    # AI context file
+├── FDD.md                       # This document
+└── README.md                    # Project documentation
 ```
 
 ---
 
-## 8. EventBridge Schedule Strategy
-
-```
-Daily at midnight (00:00):
-  → Lambda fetches tomorrow's prayer times from AlAdhan
-  → Calculates exact UTC timestamps for each prayer
-  → Creates/updates 5 EventBridge rules dynamically
-
-At each prayer time (dynamic cron):
-  → EventBridge fires → Lambda triggered
-  → AudioPlayer plays Adhan via Proactive Events API
-  → Widget datasource refreshed with new next-prayer info
-```
-
----
-
-## 9. Constraints & Known Limitations
+## 10. Constraints & Known Limitations
 
 | Constraint | Impact | Mitigation |
 |---|---|---|
-| Alexa cannot auto-play audio without user consent | Adhan needs one-time skill enable | Document in README setup steps |
-| APL-W widget refresh rate limited | Countdown may drift ±60s | Acceptable for prayer time use case |
-| AlAdhan API is community-maintained | Occasional downtime possible | Cache last known times in Lambda /tmp |
-| Alexa Skill certification takes 3-5 days | Delays initial release | Start cert process early |
-| Echo Show sleeps but widget persists | Screen dims but times visible | Expected behavior, not a bug |
+| SSML audio 240-second limit | Fajr adhan (4:02) is within limit | Monitor if limit changes |
+| Adhan 5-minute cooldown | Screen may show stale data during cooldown | Cooldown covers longest adhan + buffer |
+| Device Address requires permission | Users must grant in Alexa app | Permissions consent card + spoken instructions |
+| US timezone mapping only | Non-US falls back to env var | Add international timezone detection in v2 |
+| No multi-device adhan | Only plays on device running skill | Echo speaker pair may work; Alexa SDK limitation |
+| Lambda cold starts | Location lost, re-fetched on next PING | Cached per warm instance; transparent to user |
+| AlAdhan API community-maintained | Occasional downtime | Cache last successful response in Lambda memory |
+| PING every 15 seconds | ~122K Lambda invocations/month | Within free tier; ~$0.06/month post free-tier |
 
 ---
 
-## 10. v2 Roadmap (Post-Launch)
+## 11. v2 Roadmap (Post-Launch)
 
-- [ ] User-configurable city (city/state/country via Alexa settings)
-- [ ] Calculation method selection (ISNA, MWL, Egyptian, etc.)
-- [ ] Madhab selection (Hanafi/Shafi) — Hanafi is v1 default
+- [ ] Multi-device Adhan broadcasting (pending Alexa SDK support)
+- [ ] International timezone auto-detection (non-US countries)
+- [ ] Calculation method selection UI (ISNA, MWL, Egyptian, etc.)
+- [ ] Madhab selection UI (Hanafi/Shafi'i toggle)
 - [ ] English translations of Hadiths
-- [ ] Iqama countdown (configurable offset after Adhan)
-- [ ] Jumah (Friday) special display
-- [ ] Multiple language support
+- [ ] Iqama countdown timer (after adhan)
 - [ ] Azkar screen post-prayer
-- [ ] Custom CSV prayer times upload (restore wcsv.js functionality)
-- [ ] Admin web UI at tawkit-echo-admin.com
+- [ ] Custom prayer time adjustments (+/- minutes per prayer)
+- [ ] DynamoDB for user preferences persistence
+- [ ] Multiple language support (Arabic, Urdu)
+- [ ] Alexa certification for public skill store
 
 ---
 
-*Document Owner: Atif Jaffery*  
-*Last Updated: March 2026*  
-*Status: Draft v1.0*
+*Document Owner: Atif Jaffery*
+*Last Updated: March 2026*
+*Status: v1.1 — Development*
