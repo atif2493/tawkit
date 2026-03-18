@@ -7,7 +7,7 @@
 const Alexa = require('ask-sdk');
 const { getPrayerTimes } = require('./prayerService');
 const { getCurrentContent } = require('./contentService');
-const { buildDatasource, buildAplDirective, buildWidgetDirective, buildSpeechText, loadAplDocument } = require('./aplBuilder');
+const { buildDatasource, buildAplDirective, buildSpeechText, loadAplDocument } = require('./aplBuilder');
 const { CONFIG } = require('./prayerService');
 const { setPrayerReminders, setRamadanReminders, getDeviceAddressRaw } = require('./reminderService');
 const { getRamadanContext } = require('./ramadanService');
@@ -16,9 +16,7 @@ const { timeToMinutes, getCurrentTimeStr } = require('./countdownService');
 // Track which prayer's adhan has been played (per Lambda warm instance)
 let _lastAdhanPlayed = '';
 let _adhanPlayingUntil = 0; // timestamp (ms) — suppress PINGs while adhan is playing
-let _playIftarDuaNext = false; // flag to queue iftar dua after Maghrib adhan
-
-const ADHAN_DURATION_MS = 300000; // 5 minutes — covers Fajr adhan (4:02) + buffer
+const ADHAN_DURATION_MS = 240000; // 4 minutes — covers adhan (~3 min) + iftar dua (~23s) + buffer
 
 const S3_BUCKET = process.env.S3_BUCKET || 'my-prayer-time-content-357977905088';
 const S3_REGION = 'us-east-1';
@@ -392,11 +390,15 @@ const UserEventPingHandler = {
       // Play adhan via SSML <audio> — keeps APL screen visible and session alive
       const ramadan = getRamadanContext(prayerTimes, timezone);
       const isIftarAdhan = (adhan.prayerName === 'Maghrib' && ramadan.isRamadan);
+      const isSuhoorAdhan = (adhan.prayerName === 'Fajr' && ramadan.isRamadan);
 
       let ssml = `<speak><audio src="${adhanUrl}" />`;
       if (isIftarAdhan) {
-        console.log('[index] Will play iftar dua after Maghrib adhan');
+        console.log('[index] Chaining iftar dua after Maghrib adhan');
         ssml += `<break time="2s"/><audio src="${IFTAR_DUA_URL}" />`;
+      } else if (isSuhoorAdhan) {
+        console.log('[index] Chaining suhoor niyyah after Fajr adhan');
+        ssml += `<break time="2s"/>Wa bisawmi ghadin nawaytu min shahri Ramadan. <break time="1s"/> I intend to keep the fast for today in the month of Ramadan.`;
       }
       ssml += '</speak>';
       response.speak(ssml);
@@ -434,6 +436,19 @@ const PlaybackControllerHandler = {
   handle(handlerInput) {
     // Stop adhan if user presses pause
     _adhanPlayingUntil = 0;
+    return handlerInput.responseBuilder.getResponse();
+  },
+};
+
+// Catch-all handler for any unrecognized request types (Connections.Response, System.*, etc.)
+// Prevents "Unable to find a suitable request handler" errors that kill the session
+const FallbackRequestHandler = {
+  canHandle() {
+    return true; // matches anything not caught by previous handlers
+  },
+  handle(handlerInput) {
+    const requestType = Alexa.getRequestType(handlerInput.requestEnvelope);
+    console.log(`[index] Unhandled request type: ${requestType} — returning empty response`);
     return handlerInput.responseBuilder.getResponse();
   },
 };
@@ -487,6 +502,7 @@ exports.handler = async (event, context) => {
       HelpIntentHandler,
       CancelAndStopIntentHandler,
       SessionEndedRequestHandler,
+      FallbackRequestHandler,
     )
     .addErrorHandlers(ErrorHandler)
     .withSkillId(process.env.SKILL_ID || '')
