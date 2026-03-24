@@ -1,0 +1,27 @@
+{
+  "askcliResourcesVersion": "2020-11-30",
+  "profiles": {
+    "default": {
+      "skillMetadata": {
+        "src": "./skill-package"
+      },
+      "code": {
+        "default": {
+          "src": "./lambda"
+        }
+      },
+      "skillInfrastructure": {
+        "type": "@ask-cli/cfn-deployer",
+        "userConfig": {
+          "runtime":        "nodejs20.x",
+          "handler":        "index.handler",
+          "templatePath":   "./template.yaml",
+          "awsCustomerManagedKMSKey": "",
+          "cfnDeployerSettings": {
+            "stackName": "my-prayer-time"
+          }
+        }
+      }
+    }
+  }
+}

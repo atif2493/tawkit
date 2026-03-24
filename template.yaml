@@ -51,8 +51,8 @@ Parameters:
     Description: "AlAdhan calculation method — 2=ISNA (North America)"
   PrayerSchool:
     Type:    String
-    Default: "0"
-    Description: "Juristic school — 0=Shafi'i (earlier Asr), 1=Hanafi (later Asr)"
+    Default: "1"
+    Description: "Juristic school — 0=Shafi'i (earlier Asr), 1=Hanafi (later Asr) — MUST be 1"
   PrayerTimezone:
     Type:    String
     Default: America/New_York
@@ -70,8 +70,8 @@ Parameters:
     Description: "Iqama time for Asr (24hr format)"
   IqamaMaghrib:
     Type:    String
-    Default: "19:25"
-    Description: "Iqama time for Maghrib (24hr format)"
+    Default: "10"
+    Description: "Minutes after Maghrib adhan for Iqama. OFFSET not clock time — Maghrib (sunset) changes every day"
   IqamaIsha:
     Type:    String
     Default: "21:15"
@@ -105,23 +105,40 @@ Parameters:
 Resources:
 
   # ── S3 Bucket for content.json and Adhan audio ──────────────────────────────
+  # No BucketName — let CF generate one to avoid conflicts with pre-existing buckets.
+  # Lambda reads the name via S3_BUCKET env var = !Ref ContentBucket (set below).
   ContentBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "my-prayer-time-content-${AWS::AccountId}"
       VersioningConfiguration:
         Status: Enabled
       PublicAccessBlockConfiguration:
         BlockPublicAcls:       true
-        BlockPublicPolicy:     true
+        BlockPublicPolicy:     false   # must be false to attach the audio/* public-read policy
         IgnorePublicAcls:      true
-        RestrictPublicBuckets: true
+        RestrictPublicBuckets: false   # must be false to serve objects via a public bucket policy
+
+  # ── Public-read policy for audio/* only (required for Alexa SSML <audio> src) ────────
+  # Alexa fetches the adhan MP3 directly — must be a public HTTPS URL.
+  # Only audio/ is exposed; all other objects stay private.
+  ContentBucketAudioPolicy:
+    Type: AWS::S3::BucketPolicy
+    DependsOn: ContentBucket
+    Properties:
+      Bucket: !Ref ContentBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowPublicReadAudio
+            Effect: Allow
+            Principal: "*"
+            Action: s3:GetObject
+            Resource: !Sub "${ContentBucket.Arn}/audio/*"
 
   # ── Main Lambda Function ─────────────────────────────────────────────────────
   MyPrayerTimeFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: my-prayer-time
       CodeUri:      ./lambda
       Handler:      index.handler
       Description:  "My Prayer Time — Alexa skill handler + prayer time refresh"
@@ -139,7 +156,6 @@ Resources:
         MidnightReset:
           Type: Schedule
           Properties:
-            Name:        MyPrayerTimeMidnightReset
             Description: "Clear prayer times cache at midnight Eastern"
             Schedule:    cron(0 5 * * ? *)
             Input:       '{"detail-type":"MyPrayerTimeMidnightReset"}'
@@ -153,7 +169,6 @@ Resources:
         FajrTrigger:
           Type: Schedule
           Properties:
-            Name:        MyPrayerTimeFajr
             Description: "Fajr prayer time trigger — Apex NC (05:12 ET = 10:12 UTC)"
             Schedule:    cron(12 10 * * ? *)
             Input:       '{"detail-type":"MyPrayerTimePrayerTime","prayerName":"Fajr"}'
@@ -162,7 +177,6 @@ Resources:
         DhuhrTrigger:
           Type: Schedule
           Properties:
-            Name:        MyPrayerTimeDhuhr
             Description: "Dhuhr prayer time trigger — Apex NC (12:31 ET = 17:31 UTC)"
             Schedule:    cron(31 17 * * ? *)
             Input:       '{"detail-type":"MyPrayerTimePrayerTime","prayerName":"Dhuhr"}'
@@ -171,7 +185,6 @@ Resources:
         AsrTrigger:
           Type: Schedule
           Properties:
-            Name:        MyPrayerTimeAsr
             Description: "Asr prayer time trigger — Apex NC Hanafi (16:15 ET = 21:15 UTC)"
             Schedule:    cron(15 21 * * ? *)
             Input:       '{"detail-type":"MyPrayerTimePrayerTime","prayerName":"Asr"}'
@@ -180,7 +193,6 @@ Resources:
         MaghribTrigger:
           Type: Schedule
           Properties:
-            Name:        MyPrayerTimeMaghrib
             Description: "Maghrib prayer time trigger — Apex NC (18:19 ET = 23:19 UTC)"
             Schedule:    cron(19 23 * * ? *)
             Input:       '{"detail-type":"MyPrayerTimePrayerTime","prayerName":"Maghrib"}'
@@ -189,7 +201,6 @@ Resources:
         IshaTrigger:
           Type: Schedule
           Properties:
-            Name:        MyPrayerTimeIsha
             Description: "Isha prayer time trigger — Apex NC (19:45 ET = 00:45 UTC+1)"
             Schedule:    cron(45 0 * * ? *)
             Input:       '{"detail-type":"MyPrayerTimePrayerTime","prayerName":"Isha"}'

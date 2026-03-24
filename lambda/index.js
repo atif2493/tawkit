@@ -119,8 +119,27 @@ let _deviceLocationFetched = false;
 async function buildPrayerTimesResponse(handlerInput) {
   // Get device location on first invocation, cache for subsequent PINGs
   if (!_deviceLocationFetched) {
-    _deviceLocation = await getDeviceLocation(handlerInput);
+    // Parallelize: fetch location + prayer times (with defaults) + APL doc simultaneously
+    const [location, defaultPrayerTimes, aplDocument] = await Promise.all([
+      getDeviceLocation(handlerInput),
+      getPrayerTimes(false, null), // start with default location
+      Promise.resolve(loadAplDocument()),
+    ]);
+    _deviceLocation = location;
     _deviceLocationFetched = true;
+
+    // If device location differs from default, re-fetch prayer times for correct location
+    const needsRefetch = _deviceLocation && (
+      _deviceLocation.city.toUpperCase() !== CONFIG.city.toUpperCase() ||
+      _deviceLocation.state.toUpperCase() !== CONFIG.state.toUpperCase()
+    );
+    const prayerTimes = needsRefetch ? await getPrayerTimes(false, _deviceLocation) : defaultPrayerTimes;
+    const timezone = _deviceLocation ? _deviceLocation.timezone : CONFIG.timezone;
+    const content = getCurrentContent(timezone);
+    const datasource = buildDatasource(prayerTimes, timezone);
+    const speechText = buildSpeechText(prayerTimes, timezone);
+
+    return _buildResponse(handlerInput, datasource, content, aplDocument, speechText, prayerTimes, timezone);
   }
 
   const timezone = _deviceLocation ? _deviceLocation.timezone : CONFIG.timezone;
@@ -130,26 +149,32 @@ async function buildPrayerTimesResponse(handlerInput) {
   const speechText = buildSpeechText(prayerTimes, timezone);
   const aplDocument = loadAplDocument();
 
-  // Set prayer reminders (non-blocking — don't fail the response if reminders fail)
-  try {
-    const reminderResult = await setPrayerReminders(handlerInput, prayerTimes, timezone);
-    if (reminderResult.success) {
-      console.log(`[index] Set ${reminderResult.count} reminders (travel: ${reminderResult.travelMinutes}min)`);
-    } else {
-      console.log(`[index] Reminders skipped: ${reminderResult.reason}`);
-    }
+  return _buildResponse(handlerInput, datasource, content, aplDocument, speechText, prayerTimes, timezone);
+}
 
-    // Set Ramadan reminders if in Ramadan
-    const ramadanContext = getRamadanContext(prayerTimes, timezone);
-    if (ramadanContext.isRamadan) {
-      const ramadanResult = await setRamadanReminders(handlerInput, prayerTimes, timezone, ramadanContext);
-      if (ramadanResult.success) {
-        console.log(`[index] Set ${ramadanResult.count} Ramadan reminders`);
+function _buildResponse(handlerInput, datasource, content, aplDocument, speechText, prayerTimes, timezone) {
+  // Set prayer reminders in background (fire-and-forget — don't block the response)
+  (async () => {
+    try {
+      const reminderResult = await setPrayerReminders(handlerInput, prayerTimes, timezone);
+      if (reminderResult.success) {
+        console.log(`[index] Set ${reminderResult.count} reminders (travel: ${reminderResult.travelMinutes}min)`);
+      } else {
+        console.log(`[index] Reminders skipped: ${reminderResult.reason}`);
       }
+
+      // Set Ramadan reminders if in Ramadan
+      const ramadanContext = getRamadanContext(prayerTimes, timezone);
+      if (ramadanContext.isRamadan) {
+        const ramadanResult = await setRamadanReminders(handlerInput, prayerTimes, timezone, ramadanContext);
+        if (ramadanResult.success) {
+          console.log(`[index] Set ${ramadanResult.count} Ramadan reminders`);
+        }
+      }
+    } catch (err) {
+      console.warn('[index] Reminder setup failed (non-fatal):', err.message);
     }
-  } catch (err) {
-    console.warn('[index] Reminder setup failed (non-fatal):', err.message);
-  }
+  })();
 
   // If device location not available, add setup instructions to speech (first launch only)
   let finalSpeech = speechText;

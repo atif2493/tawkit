@@ -6,7 +6,7 @@
 
 const path = require('path');
 const fs = require('fs');
-const { getNextPrayer, formatTo12Hr, formatCountdown, formatCountdownSpeech, getCountdownUrgency, getPrayerStatuses } = require('./countdownService');
+const { getNextPrayer, formatTo12Hr, formatCountdown, formatCountdownSpeech, getCountdownUrgency, getPrayerStatuses, addMinutesToTime, timeToMinutes } = require('./countdownService');
 const { getRamadanContext } = require('./ramadanService');
 const { getDhulHijjahContext } = require('./hajjService');
 
@@ -62,13 +62,26 @@ function getMoonPhaseEmoji(hijriDay) {
   return '🌑';
 }
 
-function getIqamaTimes() {
+/**
+ * Get iqama times. Fajr/Dhuhr/Asr/Isha are fixed times from env vars.
+ * Maghrib MUST be a dynamic offset (minutes after sunset adhan), never a fixed clock time,
+ * because sunset changes every day. IQAMA_MAGHRIB env var = minutes after adhan (default 5).
+ * @param {object} prayerTimes - needed to compute Maghrib iqama from actual sunset time
+ */
+function getIqamaTimes(prayerTimes) {
+  // Maghrib: offset in minutes after the actual prayer time (sunset varies daily)
+  const maghribOffsetMins = parseInt(process.env.IQAMA_MAGHRIB || '10', 10);
+  const maghribAdhan = prayerTimes && prayerTimes.maghrib ? prayerTimes.maghrib : null;
+  const maghribIqama = maghribAdhan
+    ? addMinutesToTime(maghribAdhan, maghribOffsetMins)
+    : addMinutesToTime('19:30', maghribOffsetMins); // safe fallback (never shown if API is up)
+
   return {
-    fajr:    process.env.IQAMA_FAJR    || '06:30',
-    dhuhr:   process.env.IQAMA_DHUHR   || '13:30',
-    asr:     process.env.IQAMA_ASR     || '17:30',
-    maghrib: process.env.IQAMA_MAGHRIB || '19:25',
-    isha:    process.env.IQAMA_ISHA    || '21:15',
+    fajr:    process.env.IQAMA_FAJR  || '06:30',
+    dhuhr:   process.env.IQAMA_DHUHR || '13:30',
+    asr:     process.env.IQAMA_ASR   || '17:30',
+    maghrib: maghribIqama,            // computed: adhan + offset minutes
+    isha:    process.env.IQAMA_ISHA  || '21:15',
   };
 }
 
@@ -80,7 +93,7 @@ function getJumuahTimes() {
 }
 
 function buildDatasource(prayerTimes, timezone) {
-  const iqama = getIqamaTimes();
+  const iqama = getIqamaTimes(prayerTimes);
   const next = getNextPrayer(prayerTimes, timezone, iqama);
   const statuses = getPrayerStatuses(prayerTimes, timezone, iqama);
   const urgency = next.isActive ? 'urgent' : getCountdownUrgency(next.minutesUntil);
@@ -192,7 +205,7 @@ function buildSpeechText(prayerTimes, timezone) {
   if (prayerTimes.error) {
     return "I'm sorry, I couldn't fetch prayer times right now. Please check your internet connection.";
   }
-  const iqama = getIqamaTimes();
+  const iqama = getIqamaTimes(prayerTimes);
   const next = getNextPrayer(prayerTimes, timezone, iqama);
   const statuses = getPrayerStatuses(prayerTimes, timezone, iqama);
   const countdown = formatCountdownSpeech(next.secondsUntil);
